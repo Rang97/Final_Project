@@ -10,7 +10,7 @@ spring:
 
   sql:
     init:
-      mode: always
+      mode: never
       schema-locations: classpath:schema.sql
       data-locations: classpath:data.sql
 
@@ -19,6 +19,10 @@ mybatis:
   type-aliases-package: com.example.demo
   configuration:
     map-underscore-to-camel-case: true
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration: 3600000
 
 server:
   address: 0.0.0.0
