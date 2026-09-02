@@ -1,0 +1,20 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  datasource:
+    url: jdbc:mysql://prod-db-server:3306/sajugame_prod
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  cache:
+    type: redis
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: WARN
+    com.example.sajugame: INFO
