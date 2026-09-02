@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.domain.user.repository.UserMapper">
+
+    <select id="findByLoginId"
+            resultType="com.example.demo.domain.user.entity.User">
+        SELECT user_id,
+               login_id,
+               password,
+               nickname,
+               role,
+               created_at,
+               updated_at
+        FROM `user`
+        WHERE login_id = #{loginId}
+    </select>
+
+    <select id="findById"
+            resultType="com.example.demo.domain.user.entity.User">
+        SELECT user_id,
+               login_id,
+               password,
+               nickname,
+               role,
+               created_at,
+               updated_at
+        FROM `user`
+        WHERE user_id = #{userId}
+    </select>
+
+</mapper>
