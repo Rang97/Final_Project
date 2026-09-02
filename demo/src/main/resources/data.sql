@@ -434,6 +434,13 @@ FROM game g
 JOIN game_tag t ON t.name IN ('PVP', 'COMPETITIVE')
 WHERE g.name_ko = '철권 8';
 
+-- 마비노기 모바일
+INSERT INTO game_tag_map (game_id, tag_id)
+SELECT g.game_id, t.tag_id
+FROM game g
+         JOIN game_tag t ON t.name IN ('COOP', 'MMORPG', 'CASUAL')
+WHERE g.name_ko = '마비노기 모바일';
+
 -- =========================
 -- 4. 확인용 조회
 -- =========================
