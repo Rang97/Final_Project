@@ -86,11 +86,11 @@ CREATE TABLE `saju` (
     `hour_stem` VARCHAR(10) NULL,
     `hour_branch` VARCHAR(10) NULL,
 
-    `wood_count` INT NOT NULL,
-    `fire_count` INT NOT NULL,
-    `earth_count` INT NOT NULL,
-    `metal_count` INT NOT NULL,
-    `water_count` INT NOT NULL,
+    `wood_count` DOUBLE NOT NULL,
+    `fire_count` DOUBLE NOT NULL,
+    `earth_count` DOUBLE NOT NULL,
+    `metal_count` DOUBLE NOT NULL,
+    `water_count` DOUBLE NOT NULL,
 
     `saju_animal_name` VARCHAR(50) NOT NULL,
     `calculated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
