@@ -27,7 +27,7 @@ INSERT INTO game_tag (name) VALUES
 ('OPEN_WORLD');
 
 -- =========================
--- 2. GAME (50개)
+-- 2. GAME (51개)
 -- =========================
 INSERT INTO game (name_ko, cover_url, genre, created_at) VALUES
 ('리그 오브 레전드', NULL, 'MOBA', CURRENT_TIMESTAMP),
@@ -79,7 +79,8 @@ INSERT INTO game (name_ko, cover_url, genre, created_at) VALUES
 ('EA SPORTS FC 26', NULL, '스포츠', CURRENT_TIMESTAMP),
 ('FC 온라인', NULL, '스포츠', CURRENT_TIMESTAMP),
 ('로켓 리그', NULL, '스포츠', CURRENT_TIMESTAMP),
-('철권 8', NULL, '격투', CURRENT_TIMESTAMP);
+('철권 8', NULL, '격투', CURRENT_TIMESTAMP),
+('마비노기 모바일', NULL, 'MMORPG', CURRENT_TIMESTAMP);
 
 -- =========================
 -- 3. GAME_TAG_MAP
