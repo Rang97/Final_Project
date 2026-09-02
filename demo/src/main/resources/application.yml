@@ -14,10 +14,10 @@ spring:
       schema-locations: classpath:schema.sql
       data-locations: classpath:data.sql
 
-  saju:
-    api:
-      base-url: ${SAJU_BASE_URL}
-      key: ${SAJU_API_KEY}
+saju:
+  api:
+    base-url: ${SAJU_BASE_URL}
+    key: ${SAJU_API_KEY}
 
 
 mybatis:
