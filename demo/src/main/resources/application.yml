@@ -1,5 +1,25 @@
 spring:
   application:
     name: sajugame
-  profiles:
-    active: dev
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/sajugame?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.example.demo
+  configuration:
+    map-underscore-to-camel-case: true
+
+server:
+  address: 0.0.0.0
+  port: 8080
