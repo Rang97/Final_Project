@@ -18,15 +18,32 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
+	// Spring Web
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	// Spring Security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	// Validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	// MyBatis
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5'
 	// MySQL
 	runtimeOnly 'com.mysql:mysql-connector-j'
+	// JWT
+	implementation 'io.jsonwebtoken:jjwt-api:0.13.0'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.13.0'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.13.0'
+	// Swagger (테스트 및 api 문서 : 배포시 삭제)
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.17'
+	// Lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	// Test
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
+
+
 
 tasks.named('test') {
 	useJUnitPlatform()
