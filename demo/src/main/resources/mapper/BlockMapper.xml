@@ -1,0 +1,18 @@
+
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.domain.block.repository.BlockMapper">
+
+    <select id="findBlockedUsers" resultType="com.example.demo.domain.block.dto.BlockResponse">
+        SELECT
+            b.block_id     AS blockId,
+            b.blocked_id   AS blockedUserId,
+            u.nickname     AS blockedNickname,
+            b.created_at   AS createdAt
+        FROM block b
+        JOIN user u ON b.blocked_id = u.user_id
+        WHERE b.blocker_id = #{blockerId}
+        ORDER BY b.created_at DESC
+    </select>
+
+</mapper>
