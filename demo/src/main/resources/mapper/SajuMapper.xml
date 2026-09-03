@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.domain.saju.repository.SajuMapper">
+
+    <!--  파티원 전체 사주 조회  -->
+    <select id="findElementsByUserId" resultType="SajuElementDto">
+        SELECT
+            user_id AS  userId,
+            wood_count AS wood,
+            fire_count AS fire,
+            earth_count AS earth,
+            metal_count AS metal,
+            water_count AS water
+        FROM saju
+        WHERE user_id IN
+        -- 리스트에서 유저 id 가져옴
+        <foreach item="id" collection="userIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+</mapper>
