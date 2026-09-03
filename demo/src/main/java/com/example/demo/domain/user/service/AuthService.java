@@ -5,7 +5,10 @@ import com.example.demo.domain.user.dto.LoginResponse;
 import com.example.demo.domain.user.dto.LoginUserResponse;
 import com.example.demo.domain.user.dto.SignupRequest;
 import com.example.demo.domain.user.dto.SignupResponse;
+import com.example.demo.domain.saju.entity.SajuInput;
+import com.example.demo.domain.saju.repository.SajuInputMapper;
 import com.example.demo.domain.user.entity.User;
+import com.example.demo.domain.user.entity.BirthTimeBranch;
 import com.example.demo.domain.user.repository.UserMapper;
 import com.example.demo.common.exception.DuplicateLoginIdException;
 import com.example.demo.global.jwt.JwtProvider;
@@ -24,6 +27,7 @@ public class AuthService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final SajuInputMapper sajuInputMapper;
 
     @Transactional
     public SignupResponse signup(SignupRequest request) {
@@ -47,7 +51,21 @@ public class AuthService {
             throw new DuplicateLoginIdException();
         }
 
-        return SignupResponse.from(user);
+        BirthTimeBranch birthTimeBranch = request.birthDate() == null
+                ? null
+                : request.birthTimeBranch() == null
+                        ? BirthTimeBranch.UNKNOWN
+                        : request.birthTimeBranch();
+
+        if (request.birthDate() != null) {
+            sajuInputMapper.insert(SajuInput.from(
+                    user.getUserId(),
+                    request.birthDate(),
+                    birthTimeBranch
+            ));
+        }
+
+        return SignupResponse.from(user, request.birthDate(), birthTimeBranch);
     }
 
     public LoginResponse login(LoginRequest request) {

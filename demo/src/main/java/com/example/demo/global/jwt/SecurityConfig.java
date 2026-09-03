@@ -42,7 +42,11 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/signup", "/api/auth/login").permitAll()
+                        .requestMatchers(
+                                "/api/auth/signup",
+                                "/api/auth/login",
+                                "/api/auth/birth-time-options"
+                        ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/games").permitAll()
                         .requestMatchers(
                                 "/swagger-ui/**",
