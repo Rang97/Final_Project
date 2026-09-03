@@ -76,10 +76,10 @@ public class PartyService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 파티원을 찾을 수 없습니다.");
         }
 
-        // 4. 파티 상태 업데이트
+        // 6. 파티 상태 업데이트
         partyMemberMapper.updatePartyStatus(partyMember.getPartyMemberId(), PartyMemberStatus.KICKED);
 
-        // 5. 파티 인원 업데이트
+        // 7. 파티 인원 업데이트
         partyMapper.updateMemberCount(partyId, party.getNowMemberCount() - 1);
     }
 
