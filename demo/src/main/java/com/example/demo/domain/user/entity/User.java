@@ -18,4 +18,11 @@ public class User {
     private String role;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public User(String loginId, String password, String nickname, String role) {
+        this.loginId = loginId;
+        this.password = password;
+        this.nickname = nickname;
+        this.role = role;
+    }
 }

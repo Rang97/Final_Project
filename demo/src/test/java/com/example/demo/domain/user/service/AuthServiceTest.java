@@ -1,10 +1,11 @@
-package com.example.demo.auth.service;
+package com.example.demo.domain.user.service;
 
-import com.example.demo.auth.dto.SignupRequest;
-import com.example.demo.auth.dto.SignupResponse;
 import com.example.demo.common.exception.DuplicateLoginIdException;
-import com.example.demo.user.domain.User;
-import com.example.demo.user.mapper.UserMapper;
+import com.example.demo.domain.user.dto.SignupRequest;
+import com.example.demo.domain.user.dto.SignupResponse;
+import com.example.demo.domain.user.entity.User;
+import com.example.demo.domain.user.repository.UserMapper;
+import com.example.demo.global.jwt.JwtProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -28,7 +29,7 @@ class AuthServiceTest {
     @BeforeEach
     void setUp() {
         userMapper = mock(UserMapper.class);
-        authService = new AuthService(userMapper, new BCryptPasswordEncoder());
+        authService = new AuthService(userMapper, new BCryptPasswordEncoder(), mock(JwtProvider.class));
     }
 
     @Test
@@ -42,7 +43,9 @@ class AuthServiceTest {
             return 1;
         });
 
-        SignupResponse response = authService.signup(new SignupRequest(" tester ", "password123!", " 테스터 "));
+        SignupResponse response = authService.signup(
+                new SignupRequest(" tester ", "password123!", " 테스터 ")
+        );
 
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         verify(userMapper).insert(captor.capture());
@@ -53,15 +56,16 @@ class AuthServiceTest {
         assertThat(response.nickname()).isEqualTo("테스터");
         assertThat(savedUser.getPassword()).isNotEqualTo("password123!");
         assertThat(new BCryptPasswordEncoder().matches("password123!", savedUser.getPassword())).isTrue();
-        assertThat(savedUser.getRole()).isEqualTo(User.Role.USER);
+        assertThat(savedUser.getRole()).isEqualTo("USER");
     }
 
     @Test
     void 아이디가_중복이면_회원가입에_실패한다() {
         when(userMapper.existsByLoginId("tester")).thenReturn(true);
 
-        assertThatThrownBy(() -> authService.signup(new SignupRequest("tester", "password123!", "테스터")))
-                .isInstanceOf(DuplicateLoginIdException.class);
+        assertThatThrownBy(() -> authService.signup(
+                new SignupRequest("tester", "password123!", "테스터")
+        )).isInstanceOf(DuplicateLoginIdException.class);
 
         verify(userMapper, never()).insert(any(User.class));
     }

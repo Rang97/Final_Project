@@ -4,6 +4,22 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.demo.domain.user.repository.UserMapper">
 
+    <select id="existsByLoginId" resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1
+            FROM `user`
+            WHERE login_id = #{loginId}
+        )
+    </select>
+
+    <insert id="insert"
+            parameterType="com.example.demo.domain.user.entity.User"
+            useGeneratedKeys="true"
+            keyProperty="userId">
+        INSERT INTO `user` (login_id, password, nickname, role)
+        VALUES (#{loginId}, #{password}, #{nickname}, #{role})
+    </insert>
+
     <select id="findByLoginId"
             resultType="com.example.demo.domain.user.entity.User">
         SELECT user_id,
