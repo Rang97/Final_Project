@@ -8,8 +8,8 @@ public record SajuApiRequest(
         int birth_year,
         int birth_month,
         int birth_day,
-        int birth_hour,
-        int birth_minute,
+        Integer birth_hour,
+        Integer birth_minute,
         boolean is_lunar,
         String gender
 ) {
@@ -17,8 +17,8 @@ public record SajuApiRequest(
             int birthYear,
             int birthMonth,
             int birthDay,
-            int birthHour,
-            int birthMinute,
+            Integer birthHour,
+            Integer birthMinute,
             boolean isLunar,
             Gender gender
     ) {
