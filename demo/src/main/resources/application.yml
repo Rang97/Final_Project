@@ -20,6 +20,10 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
 
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration: 3600000
+
 server:
   address: 0.0.0.0
   port: 8080
