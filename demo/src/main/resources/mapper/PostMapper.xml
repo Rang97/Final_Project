@@ -10,7 +10,7 @@
         p.created_at AS createdAt,
         s.saju_animal_name AS writerAnimalName
         FROM post p
-        JOIN saju s ON p.writer_id = s.user_id
+        LEFT JOIN saju s ON p.writer_id = s.user_id
         <where>
             <if test="blockerId != null">
                 p.writer_id NOT IN (
@@ -36,14 +36,14 @@
 
     <select id="findPostDetail" resultType="com.example.demo.domain.post.dto.PostDetailResponse">
         SELECT
-            p.post_id    AS postId,
-            p.title      AS title,
-            p.content    AS content,
-            p.view_count AS viewCount,
-            p.created_at AS createdAt,
-            s.saju_animal_name AS writerAnimalName
+        p.post_id    AS postId,
+        p.title      AS title,
+        p.content    AS content,
+        p.view_count AS viewCount,
+        p.created_at AS createdAt,
+        s.saju_animal_name AS writerAnimalName
         FROM post p
-                 JOIN saju s ON p.writer_id = s.user_id
+         LEFT JOIN saju s ON p.writer_id = s.user_id
         WHERE p.post_id = #{postId}
     </select>
 
