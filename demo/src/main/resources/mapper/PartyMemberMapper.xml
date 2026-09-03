@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.domain.party.repository.PartyMemberMapper">
+
+    <!--  파티원 조회  -->
+    <select id="findByPartyIdAndUserId" resultType="PartyMember">
+        SELECT * FROM party_member
+        WHERE party_id = #{partyId} AND user_id = #{userId}
+    </select>
+
+    <!--  파티원 추가  -->
+    <insert id="insertPartyMember" parameterType="PartyMember" keyProperty="partyMemberId" useGeneratedKeys="true">
+        INSERT INTO party_member (party_id, user_id, status)
+        VALUES (#{partyId}, #{userId}, #{status})
+    </insert>
+    
+    <!--  파티 현황 갱신  -->
+    <update id="updatePartyStatus">
+        UPDATE party_member SET status = #{status}
+        WHERE party_member_id = #{partyMemberId}
+    </update>
+</mapper>
