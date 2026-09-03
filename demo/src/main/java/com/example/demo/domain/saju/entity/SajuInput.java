@@ -2,20 +2,23 @@ package com.example.demo.domain.saju.entity;
 
 import com.example.demo.domain.user.entity.BirthTimeBranch;
 import com.example.demo.domain.user.entity.Gender;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SajuInput {
 
     private Long sajuInputId;
-    private final Long userId;
-    private final LocalDate birthDate;
-    private final Gender gender;
-    private final CalendarType calendarType;
-    private final String birthTimeType;
-    private final BirthTimeBranch birthTimeBranch;
+    private Long userId;
+    private LocalDate birthDate;
+    private Gender gender;
+    private CalendarType calendarType;
+    private String birthTimeType;
+    private BirthTimeBranch birthTimeBranch;
 
     private SajuInput(
             Long userId,
