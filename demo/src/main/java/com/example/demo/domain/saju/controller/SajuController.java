@@ -2,8 +2,10 @@ package com.example.demo.domain.saju.controller;
 
 import com.example.demo.domain.saju.dto.SajuInputRequest;
 import com.example.demo.domain.saju.dto.SajuInputResponse;
+import com.example.demo.domain.saju.service.SajuApiPreviewService;
 import com.example.demo.domain.saju.service.SajuInputService;
 import com.example.demo.global.jwt.AuthenticatedUser;
+import com.example.demo.infra.sajuapi.dto.SajuApiRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SajuController {
 
     private final SajuInputService sajuInputService;
+    private final SajuApiPreviewService sajuApiPreviewService;
 
     @PutMapping("/input")
     public ResponseEntity<SajuInputResponse> saveOrUpdate(
@@ -37,6 +40,15 @@ public class SajuController {
     ) {
         return ResponseEntity.ok(
                 sajuInputService.getByUserId(authenticatedUser.userId())
+        );
+    }
+
+    @GetMapping("/input/preview")
+    public ResponseEntity<SajuApiRequest> previewApiRequest(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
+    ) {
+        return ResponseEntity.ok(
+                sajuApiPreviewService.preview(authenticatedUser.userId())
         );
     }
 }
