@@ -11,12 +11,16 @@
         INSERT INTO saju_input (
             user_id,
             birth_date,
+            gender,
+            calendar_type,
             birth_time_type,
             birth_time_branch
         )
         VALUES (
             #{userId},
             #{birthDate},
+            #{gender},
+            #{calendarType},
             #{birthTimeType},
             #{birthTimeBranch}
         )

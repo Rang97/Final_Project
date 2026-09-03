@@ -7,6 +7,8 @@ import com.example.demo.domain.user.entity.BirthTimeBranch;
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.repository.UserMapper;
 import com.example.demo.domain.saju.entity.SajuInput;
+import com.example.demo.domain.saju.entity.CalendarType;
+import com.example.demo.domain.user.entity.Gender;
 import com.example.demo.domain.saju.repository.SajuInputMapper;
 import com.example.demo.global.jwt.JwtProvider;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,7 +62,9 @@ class AuthServiceTest {
                         "password123!",
                         " 테스터 ",
                         LocalDate.of(2000, 1, 1),
-                        BirthTimeBranch.CHUK
+                        BirthTimeBranch.CHUK,
+                        Gender.FEMALE,
+                        CalendarType.SOLAR
                 )
         );
 
@@ -73,6 +77,8 @@ class AuthServiceTest {
         assertThat(response.nickname()).isEqualTo("테스터");
         assertThat(response.birthDate()).isEqualTo(LocalDate.of(2000, 1, 1));
         assertThat(response.birthTimeBranch()).isEqualTo("CHUK");
+        assertThat(response.gender()).isEqualTo(Gender.FEMALE);
+        assertThat(response.calendarType()).isEqualTo(CalendarType.SOLAR);
         assertThat(savedUser.getPassword()).isNotEqualTo("password123!");
         assertThat(new BCryptPasswordEncoder().matches("password123!", savedUser.getPassword())).isTrue();
         assertThat(savedUser.getRole()).isEqualTo("USER");
@@ -80,6 +86,8 @@ class AuthServiceTest {
         verify(sajuInputMapper).insert(sajuInputCaptor.capture());
         assertThat(sajuInputCaptor.getValue().getUserId()).isEqualTo(1L);
         assertThat(sajuInputCaptor.getValue().getBirthDate()).isEqualTo(LocalDate.of(2000, 1, 1));
+        assertThat(sajuInputCaptor.getValue().getGender()).isEqualTo(Gender.FEMALE);
+        assertThat(sajuInputCaptor.getValue().getCalendarType()).isEqualTo(CalendarType.SOLAR);
         assertThat(sajuInputCaptor.getValue().getBirthTimeType()).isEqualTo("TIME_BRANCH");
         assertThat(sajuInputCaptor.getValue().getBirthTimeBranch()).isEqualTo(BirthTimeBranch.CHUK);
     }
@@ -89,7 +97,7 @@ class AuthServiceTest {
         when(userMapper.existsByLoginId("tester")).thenReturn(true);
 
         assertThatThrownBy(() -> authService.signup(
-                new SignupRequest("tester", "password123!", "테스터", null, null)
+                new SignupRequest("tester", "password123!", "테스터", null, null, null, null)
         )).isInstanceOf(DuplicateLoginIdException.class);
 
         verify(userMapper, never()).insert(any(User.class));
@@ -108,7 +116,7 @@ class AuthServiceTest {
         });
 
         SignupResponse response = authService.signup(
-                new SignupRequest("tester", "password123!", "테스터", null, null)
+                new SignupRequest("tester", "password123!", "테스터", null, null, null, null)
         );
 
         verify(sajuInputMapper, never()).insert(any(SajuInput.class));

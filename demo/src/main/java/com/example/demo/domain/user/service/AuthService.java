@@ -61,11 +61,19 @@ public class AuthService {
             sajuInputMapper.insert(SajuInput.from(
                     user.getUserId(),
                     request.birthDate(),
+                    request.gender(),
+                    request.calendarType(),
                     birthTimeBranch
             ));
         }
 
-        return SignupResponse.from(user, request.birthDate(), birthTimeBranch);
+        return SignupResponse.from(
+                user,
+                request.birthDate(),
+                birthTimeBranch,
+                request.gender(),
+                request.calendarType()
+        );
     }
 
     public LoginResponse login(LoginRequest request) {
