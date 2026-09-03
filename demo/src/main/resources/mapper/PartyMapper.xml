@@ -33,4 +33,10 @@
         WHERE party_id = #{partyId}
     </update>
 
+    <!--  파티 상태 변경  -->
+    <update id="updateStatus">
+        UPDATE party SET status = #{status}
+        WHERE party_id = #{partyId}
+    </update>
+
 </mapper>

@@ -4,6 +4,7 @@ import com.example.demo.domain.party.dto.PartyCreateRequest;
 import com.example.demo.domain.party.entity.Party;
 import com.example.demo.domain.party.entity.PartyMember;
 import com.example.demo.domain.party.entity.PartyMemberStatus;
+import com.example.demo.domain.party.entity.PartyStatus;
 import com.example.demo.domain.party.repository.PartyMapper;
 import com.example.demo.domain.party.repository.PartyMemberMapper;
 import lombok.RequiredArgsConstructor;
@@ -81,6 +82,11 @@ public class PartyService {
 
         // 7. 파티 인원 업데이트
         partyMapper.updateMemberCount(partyId, party.getNowMemberCount() - 1);
+
+        // 8. 파티 상태 변경 (정원 도달한 후)
+        if (party.getStatus() == PartyStatus.FULL){
+            partyMapper.updateStatus(partyId, PartyStatus.RECRUITING);
+        }
     }
 
 }

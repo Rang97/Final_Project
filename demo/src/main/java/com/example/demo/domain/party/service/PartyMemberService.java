@@ -34,6 +34,11 @@ public class PartyMemberService {
                 partyMemberMapper.updatePartyStatus(existing.getPartyMemberId(), PartyMemberStatus.APPROVED);
             }
             partyMapper.updateMemberCount(partyId, party.getNowMemberCount() + 1);
+
+            // 정원 도달 시 파티 상태 FULL 변경
+            if (party.getNowMemberCount() + 1 == party.getMaxMemberCount()){
+                partyMapper.updateStatus(partyId, PartyStatus.FULL);
+            }
         } else {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "가입할 수 없는 파티입니다.");
         }
@@ -51,6 +56,11 @@ public class PartyMemberService {
         }
         partyMemberMapper.updatePartyStatus(partyMember.getPartyMemberId(), PartyMemberStatus.LEFT);
         partyMapper.updateMemberCount(partyId, party.getNowMemberCount() - 1);
+
+        // 정원 도달 후 파티 상태 RECRUITING 변경
+        if (party.getStatus() == PartyStatus.FULL){
+            partyMapper.updateStatus(partyId, PartyStatus.RECRUITING);
+        }
     }
     //
 }
