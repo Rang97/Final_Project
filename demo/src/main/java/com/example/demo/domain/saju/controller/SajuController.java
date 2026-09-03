@@ -2,7 +2,9 @@ package com.example.demo.domain.saju.controller;
 
 import com.example.demo.domain.saju.dto.SajuInputRequest;
 import com.example.demo.domain.saju.dto.SajuInputResponse;
+import com.example.demo.domain.saju.dto.SajuResponse;
 import com.example.demo.domain.saju.service.SajuApiPreviewService;
+import com.example.demo.domain.saju.service.SajuCalculationService;
 import com.example.demo.domain.saju.service.SajuInputService;
 import com.example.demo.global.jwt.AuthenticatedUser;
 import com.example.demo.infra.sajuapi.dto.SajuApiRequest;
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +26,7 @@ public class SajuController {
 
     private final SajuInputService sajuInputService;
     private final SajuApiPreviewService sajuApiPreviewService;
+    private final SajuCalculationService sajuCalculationService;
 
     @PutMapping("/input")
     public ResponseEntity<SajuInputResponse> saveOrUpdate(
@@ -49,6 +53,15 @@ public class SajuController {
     ) {
         return ResponseEntity.ok(
                 sajuApiPreviewService.preview(authenticatedUser.userId())
+        );
+    }
+
+    @PostMapping("/calculate")
+    public ResponseEntity<SajuResponse> calculate(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser
+    ) {
+        return ResponseEntity.ok(
+                sajuCalculationService.calculate(authenticatedUser.userId())
         );
     }
 }
