@@ -8,7 +8,7 @@
         c.created_at AS createdAt,
         s.saju_animal_name AS writerAnimalName
         FROM comment c
-        JOIN saju s ON c.writer_id = s.user_id
+        LEFT JOIN saju s ON c.writer_id = s.user_id
         <where>
             c.post_id = #{postId}
             <if test="blockerId != null">
