@@ -107,4 +107,20 @@
         WHERE user_id = #{userId}
     </select>
 
+    <!-- 파티원 전체 사주 오행 조회 -->
+    <select id="findElementsByUserId"
+            resultType="com.example.demo.domain.saju.dto.SajuElementDto">
+        SELECT user_id AS userId,
+               wood_count AS wood,
+               fire_count AS fire,
+               earth_count AS earth,
+               metal_count AS metal,
+               water_count AS water
+        FROM saju
+        WHERE user_id IN
+        <foreach item="id" collection="userIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
 </mapper>
