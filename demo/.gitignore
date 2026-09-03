@@ -39,3 +39,4 @@ out/
 ### 중요설정 ###
 *.local
 .env.local
+.env

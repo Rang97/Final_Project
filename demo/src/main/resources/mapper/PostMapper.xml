@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.domain.post.repository.PostMapper">
+
+    <select id="findVisiblePosts" resultType="com.example.demo.domain.post.dto.PostListResponse">
+        SELECT
+        p.post_id    AS postId,
+        p.title      AS title,
+        p.view_count AS viewCount,
+        p.created_at AS createdAt,
+        s.saju_animal_name AS writerAnimalName
+        FROM post p
+        JOIN saju s ON p.writer_id = s.user_id
+        <where>
+            <if test="blockerId != null">
+                p.writer_id NOT IN (
+                SELECT blocked_id FROM block WHERE blocker_id = #{blockerId}
+                )
+            </if>
+        </where>
+        ORDER BY p.created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countVisiblePosts" resultType="int">
+        SELECT COUNT(*)
+        FROM post p
+        <where>
+            <if test="blockerId != null">
+                p.writer_id NOT IN (
+                SELECT blocked_id FROM block WHERE blocker_id = #{blockerId}
+                )
+            </if>
+        </where>
+    </select>
+
+    <select id="findPostDetail" resultType="com.example.demo.domain.post.dto.PostDetailResponse">
+        SELECT
+            p.post_id    AS postId,
+            p.title      AS title,
+            p.content    AS content,
+            p.view_count AS viewCount,
+            p.created_at AS createdAt,
+            s.saju_animal_name AS writerAnimalName
+        FROM post p
+                 JOIN saju s ON p.writer_id = s.user_id
+        WHERE p.post_id = #{postId}
+    </select>
+
+</mapper>
