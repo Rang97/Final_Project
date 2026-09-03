@@ -55,6 +55,7 @@ public class PartyService {
     }
 
     // 파티원 추방
+    @Transactional
     public void deletePartyMember(Long hostId, Long partyId, Long targetUserId) {
         // 1. 방장 확인
         Party party = partyMapper.findById(partyId);

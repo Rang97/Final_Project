@@ -9,6 +9,7 @@ import com.example.demo.domain.party.repository.PartyMemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -20,6 +21,7 @@ public class PartyMemberService {
 
 
     // 파티 참가
+    @Transactional
     public void joinParty(Long partyId, Long userId) {
         Party party = partyMapper.findById(partyId);
 
@@ -45,6 +47,7 @@ public class PartyMemberService {
     }
 
     // 파티 떠나기
+    @Transactional
     public void leaveParty(Long partyId, Long userId) {
         Party party = partyMapper.findById(partyId);
         if (party.getHostId().equals(userId)) {
@@ -62,5 +65,5 @@ public class PartyMemberService {
             partyMapper.updateStatus(partyId, PartyStatus.RECRUITING);
         }
     }
-    //
+
 }
