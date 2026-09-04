@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.domain.saju.repository.SajuMapper">
+
+    <insert id="upsert"
+            parameterType="com.example.demo.domain.saju.entity.Saju"
+            useGeneratedKeys="true"
+            keyProperty="sajuId">
+        INSERT INTO saju (
+            user_id,
+            gender,
+            birth_date,
+            calendar_type,
+            birth_time_type,
+            birth_time,
+            birth_time_branch,
+            year_stem,
+            year_branch,
+            month_stem,
+            month_branch,
+            day_stem,
+            day_branch,
+            hour_stem,
+            hour_branch,
+            wood_count,
+            fire_count,
+            earth_count,
+            metal_count,
+            water_count,
+            saju_animal_name
+        ) VALUES (
+            #{userId},
+            #{gender},
+            #{birthDate},
+            #{calendarType},
+            #{birthTimeType},
+            #{birthTime},
+            #{birthTimeBranch},
+            #{yearStem},
+            #{yearBranch},
+            #{monthStem},
+            #{monthBranch},
+            #{dayStem},
+            #{dayBranch},
+            #{hourStem},
+            #{hourBranch},
+            #{woodCount},
+            #{fireCount},
+            #{earthCount},
+            #{metalCount},
+            #{waterCount},
+            #{sajuAnimalName}
+        )
+        ON DUPLICATE KEY UPDATE
+            gender = VALUES(gender),
+            birth_date = VALUES(birth_date),
+            calendar_type = VALUES(calendar_type),
+            birth_time_type = VALUES(birth_time_type),
+            birth_time = VALUES(birth_time),
+            birth_time_branch = VALUES(birth_time_branch),
+            year_stem = VALUES(year_stem),
+            year_branch = VALUES(year_branch),
+            month_stem = VALUES(month_stem),
+            month_branch = VALUES(month_branch),
+            day_stem = VALUES(day_stem),
+            day_branch = VALUES(day_branch),
+            hour_stem = VALUES(hour_stem),
+            hour_branch = VALUES(hour_branch),
+            wood_count = VALUES(wood_count),
+            fire_count = VALUES(fire_count),
+            earth_count = VALUES(earth_count),
+            metal_count = VALUES(metal_count),
+            water_count = VALUES(water_count),
+            saju_animal_name = VALUES(saju_animal_name),
+            calculated_at = CURRENT_TIMESTAMP
+    </insert>
+
+    <select id="findByUserId"
+            resultType="com.example.demo.domain.saju.entity.Saju">
+        SELECT saju_id,
+               user_id,
+               gender,
+               birth_date,
+               calendar_type,
+               birth_time_type,
+               birth_time,
+               birth_time_branch,
+               year_stem,
+               year_branch,
+               month_stem,
+               month_branch,
+               day_stem,
+               day_branch,
+               hour_stem,
+               hour_branch,
+               wood_count,
+               fire_count,
+               earth_count,
+               metal_count,
+               water_count,
+               saju_animal_name,
+               calculated_at,
+               updated_at
+        FROM saju
+        WHERE user_id = #{userId}
+    </select>
+
+    <!-- 파티원 전체 사주 오행 조회 -->
+    <select id="findElementsByUserId"
+            resultType="com.example.demo.domain.saju.dto.SajuElementDto">
+        SELECT user_id AS userId,
+               wood_count AS wood,
+               fire_count AS fire,
+               earth_count AS earth,
+               metal_count AS metal,
+               water_count AS water
+        FROM saju
+        WHERE user_id IN
+        <foreach item="id" collection="userIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+</mapper>

@@ -1,13 +1,8 @@
 package com.example.demo.domain.user.dto;
 
-import com.example.demo.domain.user.entity.BirthTimeBranch;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import jakarta.validation.constraints.AssertTrue;
-
-import java.time.LocalDate;
 
 public record SignupRequest(
         @NotBlank(message = "아이디는 필수입니다.")
@@ -21,15 +16,6 @@ public record SignupRequest(
 
         @NotBlank(message = "닉네임은 필수입니다.")
         @Size(max = 15, message = "닉네임은 15 이하여야 합니다.")
-        String nickname,
-
-        @Past(message = "생년월일은 과거 날짜여야 합니다.")
-        LocalDate birthDate,
-
-        BirthTimeBranch birthTimeBranch
+        String nickname
 ) {
-    @AssertTrue(message = "출생 시간대를 입력하려면 생년월일도 입력해야 합니다.")
-    public boolean isBirthTimeValid() {
-        return birthTimeBranch == null || birthDate != null;
-    }
 }
