@@ -17,6 +17,7 @@ public record SajuApiResponse(FiveElements five_elements, HourPillar hour_pillar
             String weakest
     ) {}
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public record YearPillar(
             String stem,
             String stem_korean,
@@ -24,6 +25,7 @@ public record SajuApiResponse(FiveElements five_elements, HourPillar hour_pillar
             String branch_korean
     ){}
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public record MonthPillar(
             String stem,
             String stem_korean,
@@ -31,6 +33,7 @@ public record SajuApiResponse(FiveElements five_elements, HourPillar hour_pillar
             String branch_korean
     ){}
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public record DayPillar(
             String stem,
             String stem_korean,
@@ -38,6 +41,7 @@ public record SajuApiResponse(FiveElements five_elements, HourPillar hour_pillar
             String branch_korean
     ){}
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public record HourPillar(
             String stem,
             String stem_korean,

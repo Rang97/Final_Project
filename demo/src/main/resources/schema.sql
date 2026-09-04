@@ -93,7 +93,7 @@ CREATE TABLE `saju` (
     `metal_count` DOUBLE NOT NULL,
     `water_count` DOUBLE NOT NULL,
 
-    `saju_animal_name` VARCHAR(50) NOT NULL,
+    `saju_animal_name` VARCHAR(50) NULL,
     `calculated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
@@ -122,6 +122,8 @@ CREATE TABLE `saju_input` (
     `saju_input_id` BIGINT NOT NULL AUTO_INCREMENT,
     `user_id` BIGINT NOT NULL,
     `birth_date` DATE NOT NULL,
+    `gender` ENUM('MALE', 'FEMALE') NOT NULL,
+    `calendar_type` ENUM('SOLAR', 'LUNAR') NOT NULL,
     `birth_time_type` ENUM('TIME_BRANCH', 'UNKNOWN') NOT NULL,
     `birth_time_branch`
         ENUM('JA', 'CHUK', 'IN', 'MYO', 'JIN', 'SA', 'O', 'MI', 'SIN', 'YU', 'SUL', 'HAE')
