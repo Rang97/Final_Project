@@ -13,6 +13,7 @@ public record SajuInputRequest(
         @Past(message = "생년월일은 과거 날짜여야 합니다.")
         LocalDate birthDate,
 
+        @NotNull(message = "출생 시간대는 필수입니다. 모르는 경우 UNKNOWN을 선택해주세요.")
         BirthTimeBranch birthTimeBranch,
 
         @NotNull(message = "성별은 필수입니다.")
