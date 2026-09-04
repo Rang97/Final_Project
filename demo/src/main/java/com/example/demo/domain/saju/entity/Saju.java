@@ -1,5 +1,6 @@
 package com.example.demo.domain.saju.entity;
 
+import com.example.demo.domain.saju.util.SajuAnimalNameGenerator;
 import com.example.demo.domain.user.entity.BirthTimeBranch;
 import com.example.demo.domain.user.entity.Gender;
 import com.example.demo.infra.sajuapi.dto.SajuApiResponse;
@@ -63,7 +64,7 @@ public class Saju {
         this.earthCount = elements.earth();
         this.metalCount = elements.metal();
         this.waterCount = elements.water();
-        this.sajuAnimalName = null;
+        this.sajuAnimalName = SajuAnimalNameGenerator.generate(this.dayStem, this.dayBranch);
     }
 
     public static Saju from(Long userId, SajuInput input, SajuApiResponse response) {
