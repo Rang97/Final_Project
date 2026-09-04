@@ -128,11 +128,19 @@ public class PartyController {
 
     // 파티 목록 조회 (정렬 포함)
     @GetMapping("/party-list")
+    @Operation(summary = "파티 목록 조회", description = "정렬 기준(sortBy)에 따라 파티 목록을 정렬해서 반환합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 필요", content = @Content)
+    })
     public ResponseEntity<List<PartyListResponse>> getPartyList(
+            @Parameter(description = "정렬 기준. 비우면 최신순", example = "MEMBER_COUNT")
             @RequestParam(required = false) PartySortBy sortBy,
-            @RequestParam(required = false, defaultValue = "true") boolean ascending
+            @Parameter(description = "오름차순 여부", example = "true")
+            @RequestParam(required = false, defaultValue = "true") boolean ascending,
+            @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser user
     ){
-        List<PartyListResponse> parties = partyService.getPartyList(sortBy, ascending);
+        List<PartyListResponse> parties = partyService.getPartyList(sortBy, ascending, user);
         return ResponseEntity.ok(parties);
     }
 

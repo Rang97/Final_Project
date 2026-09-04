@@ -16,13 +16,17 @@
         FROM party p
         JOIN game g ON p.game_id = g.game_id
         <choose>
-            <when test="sortBy == 'TITLE'">ORDER BY g.name_ko</when>
-            <when test="sortBy == 'GENRE'">ORDER BY g.genre</when>
-            <when test="sortBy == 'MEMBER_COUNT'">ORDER BY p.now_member_count</when>
+            <when test="sortBy != null and sortBy.name() == 'TITLE'">
+                ORDER BY g.name_ko <if test="ascending">ASC</if><if test="!ascending">DESC</if>
+            </when>
+            <when test="sortBy != null and sortBy.name() == 'GENRE'">
+                ORDER BY g.genre <if test="ascending">ASC</if><if test="!ascending">DESC</if>
+            </when>
+            <when test="sortBy != null and sortBy.name() == 'MEMBER_COUNT'">
+                ORDER BY p.now_member_count <if test="ascending">ASC</if><if test="!ascending">DESC</if>
+            </when>
             <otherwise>ORDER BY p.created_at DESC</otherwise>
         </choose>
-        <if test="sortBy != null and ascending">ASC</if>
-        <if test="sortBy != null and !ascending">DESC</if>
     </select>
 
         <!--  파티 생성  -->
