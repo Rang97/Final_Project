@@ -47,7 +47,7 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/auth/birth-time-options"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/games").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/posts").permitAll()//게시판 목록 로그인 없이 허용
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
@@ -55,7 +55,9 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
+
                 )
+
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) ->
                                 writeErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED,
