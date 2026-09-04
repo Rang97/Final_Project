@@ -7,11 +7,14 @@ import com.example.demo.domain.party.entity.PartyMemberStatus;
 import com.example.demo.domain.party.entity.PartyStatus;
 import com.example.demo.domain.party.repository.PartyMapper;
 import com.example.demo.domain.party.repository.PartyMemberMapper;
+import com.example.demo.domain.saju.repository.SajuMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,11 +22,16 @@ public class PartyService {
 
     private final PartyMapper partyMapper;
     private final PartyMemberMapper partyMemberMapper;
+    private final SajuMapper sajuMapper;
 
     // <방장>
     // 파티 생성
     @Transactional
     public Party createParty(Long userId, PartyCreateRequest request) {
+        // 사주 정보 있어야 파티 가입 가능
+        if (sajuMapper.findElementsByUserId(List.of(userId)).isEmpty()){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "사주 정보를 등록해야 파티를 생성할 수 있습니다.");
+        }
 
         // 파티 객체 조립
         Party party = new Party(userId,
