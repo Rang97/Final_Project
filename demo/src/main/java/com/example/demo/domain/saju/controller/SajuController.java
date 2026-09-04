@@ -7,6 +7,7 @@ import com.example.demo.domain.saju.service.SajuApiPreviewService;
 import com.example.demo.domain.saju.service.SajuCalculationService;
 import com.example.demo.domain.saju.service.SajuInputService;
 import com.example.demo.global.jwt.AuthenticatedUser;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import com.example.demo.infra.sajuapi.dto.SajuApiRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/saju")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class SajuController {
 
     private final SajuInputService sajuInputService;
