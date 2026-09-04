@@ -1,7 +1,11 @@
 package com.example.demo.domain.party.controller;
 
 import com.example.demo.domain.party.dto.PartyCreateRequest;
+import com.example.demo.domain.party.dto.PartyListResponse;
+import com.example.demo.domain.party.entity.ChemistryType;
 import com.example.demo.domain.party.entity.Party;
+import com.example.demo.domain.party.entity.PartySortBy;
+import com.example.demo.domain.party.entity.PartyStatus;
 import com.example.demo.domain.party.service.PartyMemberService;
 import com.example.demo.domain.party.service.PartyService;
 import com.example.demo.global.jwt.AuthenticatedUser;
@@ -18,6 +22,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/party")
@@ -110,6 +116,35 @@ public class PartyController {
         partyMemberService.leaveParty(partyId, authenticatedUser.userId());
         return ResponseEntity.ok().build();
     }
+
+    // 파티 단건 조회
+    @GetMapping("/{partyId}")
+    public ResponseEntity<Party> getParty (
+            @PathVariable Long partyId
+    ){
+        Party party = partyService.getParty(partyId);
+        return ResponseEntity.ok(party);
+    }
+
+    // 파티 목록 조회 (정렬 포함)
+    @GetMapping("/party-list")
+    @Operation(summary = "파티 목록 조회", description = "정렬 기준(sortBy)에 따라 파티 목록을 정렬해서 반환합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 필요", content = @Content)
+    })
+    public ResponseEntity<List<PartyListResponse>> getPartyList(
+            @Parameter(description = "정렬 기준. 비우면 최신순", example = "MEMBER_COUNT")
+            @RequestParam(required = false) PartySortBy sortBy,
+            @Parameter(description = "오름차순 여부", example = "true")
+            @RequestParam(required = false, defaultValue = "true") boolean ascending,
+            @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser user
+    ){
+        List<PartyListResponse> parties = partyService.getPartyList(sortBy, ascending, user);
+        return ResponseEntity.ok(parties);
+    }
+
+
 
 
 }

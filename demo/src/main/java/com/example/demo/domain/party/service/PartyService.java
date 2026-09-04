@@ -1,19 +1,24 @@
 package com.example.demo.domain.party.service;
 
 import com.example.demo.domain.party.dto.PartyCreateRequest;
-import com.example.demo.domain.party.entity.Party;
-import com.example.demo.domain.party.entity.PartyMember;
-import com.example.demo.domain.party.entity.PartyMemberStatus;
-import com.example.demo.domain.party.entity.PartyStatus;
+import com.example.demo.domain.party.dto.PartyListResponse;
+import com.example.demo.domain.party.entity.*;
 import com.example.demo.domain.party.repository.PartyMapper;
 import com.example.demo.domain.party.repository.PartyMemberMapper;
+import com.example.demo.domain.saju.dto.SajuElementDto;
 import com.example.demo.domain.saju.repository.SajuMapper;
+import com.example.demo.domain.saju.service.ChemistryService;
+import com.example.demo.domain.saju.util.FiveElement;
+import com.example.demo.domain.saju.util.FiveElementProfile;
+import com.example.demo.domain.saju.util.GroupElementSummary;
+import com.example.demo.global.jwt.AuthenticatedUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -23,6 +28,7 @@ public class PartyService {
     private final PartyMapper partyMapper;
     private final PartyMemberMapper partyMemberMapper;
     private final SajuMapper sajuMapper;
+    private final ChemistryService chemistryService;
 
     // <방장>
     // 파티 생성
@@ -97,5 +103,73 @@ public class PartyService {
             partyMapper.updateStatus(partyId, PartyStatus.RECRUITING);
         }
     }
+
+    //======================================================================
+
+    // 파티 단건 조회
+    public Party getParty(Long partyId) {
+        Party party = partyMapper.findById(partyId);
+        if (party == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "파티를 찾을 수 없습니다.");
+        }
+        return party;
+    }
+
+    // 파티 목록 조회 (정렬 포함)
+    public List<PartyListResponse> getPartyList(PartySortBy sortBy, boolean ascending, AuthenticatedUser user) {
+        PartySortBy resolvedSortBy = sortBy;
+
+        // 정렬 기준이 사주 궁합인 경우
+        if (sortBy == PartySortBy.CHEMISTRY_MATCH) {
+            resolvedSortBy = resolvedSortBy(user.userId());
+        }
+
+        List<PartyListResponse> parties = partyMapper.findPartyList(resolvedSortBy, ascending);
+
+        // 오행 기준 정렬
+        if (resolvedSortBy != null && resolvedSortBy.isElement()){
+            FiveElement element = FiveElement.valueOf(resolvedSortBy.name());
+            Comparator<PartyListResponse> comparator = Comparator.comparingDouble(p -> getElementScore(p.getPartyId(), element));
+            parties.sort(ascending ? comparator : comparator.reversed());
+        }
+        return parties;
+    }
+
+    private PartySortBy resolvedSortBy(Long userId) {
+        List<FiveElementProfile> profiles = sajuMapper.findElementsByUserId(List.of(userId)).stream()
+                                                      .map(SajuElementDto::toProfile)
+                                                      .toList();
+        GroupElementSummary summary = chemistryService.summarizeGroup(profiles);
+        FiveElement weakest = summary.minElements().get(0);
+        return switch (weakest) {
+            case WOOD -> PartySortBy.WOOD;
+            case FIRE -> PartySortBy.FIRE;
+            case EARTH -> PartySortBy.EARTH;
+            case METAL -> PartySortBy.METAL;
+            case WATER -> PartySortBy.WATER;
+        };
+    }
+
+    // 파티 하나의 특정 오행 합산 점수 계산
+    private double getElementScore(Long partyId, FiveElement element) {
+        List<Long> memberIds = partyMemberMapper.findApprovedMemberIds(partyId);
+        if (memberIds.isEmpty()) {
+            return 0;
+        }
+
+        List<FiveElementProfile> profiles = sajuMapper.findElementsByUserId(memberIds).stream()
+                .map(SajuElementDto::toProfile)
+                .toList();
+        GroupElementSummary summary = chemistryService.summarizeGroup(profiles);
+
+        return switch (element){
+            case WOOD -> summary.totalWood();
+            case FIRE -> summary.totalFire();
+            case EARTH -> summary.totalEarth();
+            case METAL -> summary.totalMetal();
+            case WATER -> summary.totalWater();
+        };
+    }
+
 
 }
