@@ -1,13 +1,15 @@
 package com.example.demo.domain.party.service;
 
 import com.example.demo.domain.party.dto.PartyCreateRequest;
-import com.example.demo.domain.party.entity.Party;
-import com.example.demo.domain.party.entity.PartyMember;
-import com.example.demo.domain.party.entity.PartyMemberStatus;
-import com.example.demo.domain.party.entity.PartyStatus;
+import com.example.demo.domain.party.dto.PartyListResponse;
+import com.example.demo.domain.party.entity.*;
 import com.example.demo.domain.party.repository.PartyMapper;
 import com.example.demo.domain.party.repository.PartyMemberMapper;
+import com.example.demo.domain.saju.dto.SajuElementDto;
 import com.example.demo.domain.saju.repository.SajuMapper;
+import com.example.demo.domain.saju.service.ChemistryService;
+import com.example.demo.domain.saju.util.FiveElement;
+import com.example.demo.domain.saju.util.FiveElementProfile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ public class PartyService {
     private final PartyMapper partyMapper;
     private final PartyMemberMapper partyMemberMapper;
     private final SajuMapper sajuMapper;
+    private final ChemistryService chemistryService;
 
     // <방장>
     // 파티 생성
@@ -97,5 +100,13 @@ public class PartyService {
             partyMapper.updateStatus(partyId, PartyStatus.RECRUITING);
         }
     }
+
+    //======================================================================
+
+    // 파티 전체 목록 조회
+    public List<PartyListResponse> getPartyList() {
+        return partyMapper.findAllParty();
+    }
+
 
 }

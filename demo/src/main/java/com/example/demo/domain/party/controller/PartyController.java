@@ -1,7 +1,11 @@
 package com.example.demo.domain.party.controller;
 
 import com.example.demo.domain.party.dto.PartyCreateRequest;
+import com.example.demo.domain.party.dto.PartyListResponse;
+import com.example.demo.domain.party.entity.ChemistryType;
 import com.example.demo.domain.party.entity.Party;
+import com.example.demo.domain.party.entity.PartySortBy;
+import com.example.demo.domain.party.entity.PartyStatus;
 import com.example.demo.domain.party.service.PartyMemberService;
 import com.example.demo.domain.party.service.PartyService;
 import com.example.demo.global.jwt.AuthenticatedUser;
@@ -18,6 +22,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/party")
@@ -111,5 +117,11 @@ public class PartyController {
         return ResponseEntity.ok().build();
     }
 
+    // 파티 전체 목록 조회
+    @GetMapping("/party-list")
+    public ResponseEntity<List<PartyListResponse>> getPartyList(){
+        List<PartyListResponse> parties = partyService.getPartyList();
+        return ResponseEntity.ok(parties);
+    }
 
 }

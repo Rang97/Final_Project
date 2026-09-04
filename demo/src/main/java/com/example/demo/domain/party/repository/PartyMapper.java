@@ -1,6 +1,9 @@
 package com.example.demo.domain.party.repository;
 
+import com.example.demo.domain.party.dto.PartyListResponse;
+import com.example.demo.domain.party.entity.ChemistryType;
 import com.example.demo.domain.party.entity.Party;
+import com.example.demo.domain.party.entity.PartySortBy;
 import com.example.demo.domain.party.entity.PartyStatus;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -10,11 +13,11 @@ import java.util.List;
 @Mapper
 public interface PartyMapper {
 
-    // 파티 조회
+    // 파티 단건 조회
     public Party findById(Long partyId);
 
-    // 파티 전체 조회
-    public List<Party> findAllParty();
+    // 파티 전체 목록 조회
+    public List<PartyListResponse> findAllParty();
 
     // 파티 생성
     public void insertParty(Party party);
