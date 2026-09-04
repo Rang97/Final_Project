@@ -28,4 +28,12 @@ public class GlobalExceptionHandler {
         }
         return new ErrorResponse("INVALID_INPUT", "입력값을 확인해 주세요.", errors);
     }
+
+    //차단 유저 예외 처리
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleIllegalArgument(IllegalArgumentException exception) {
+        return new ErrorResponse("INVALID_ARGUMENT", exception.getMessage());
+    }
+
 }
