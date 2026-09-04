@@ -117,6 +117,15 @@ public class PartyController {
         return ResponseEntity.ok().build();
     }
 
+    // 파티 단건 조회
+    @GetMapping("/{partyId}")
+    public ResponseEntity<Party> getParty (
+            @PathVariable Long partyId
+    ){
+        Party party = partyService.getParty(partyId);
+        return ResponseEntity.ok(party);
+    }
+
     // 파티 목록 조회 (정렬 포함)
     @GetMapping("/party-list")
     public ResponseEntity<List<PartyListResponse>> getPartyList(

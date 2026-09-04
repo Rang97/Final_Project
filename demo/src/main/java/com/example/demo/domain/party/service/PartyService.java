@@ -103,6 +103,15 @@ public class PartyService {
 
     //======================================================================
 
+    // 파티 단건 조회
+    public Party getParty(Long partyId) {
+        Party party = partyMapper.findById(partyId);
+        if (party == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "파티를 찾을 수 없습니다.");
+        }
+        return party;
+    }
+
     // 파티 목록 조회 (정렬 포함)
     public List<PartyListResponse> getPartyList(PartySortBy sortBy, boolean ascending) {
         return partyMapper.findPartyList(sortBy, ascending);
