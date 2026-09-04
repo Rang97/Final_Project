@@ -9,20 +9,20 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 // 파티 목록 응답 DTO
-
-public record PartyListResponse (
-        Long partyId,
-        Long hostId,
-        String title,
-        String coverUrl,
-        Long gameId,
-        String gameName,
-        String genre,
-        int maxMemberCount,
-        int nowMemberCount,
-        ChemistryType chemistryType,
-        PartyStatus status,
-        LocalDateTime createdAt
-){
-
+@Getter
+@Setter
+@RequiredArgsConstructor
+public class PartyListResponse {
+    Long partyId;
+    Long hostId;
+    String title;
+    String coverUrl;
+    Long gameId;
+    String gameName;
+    String genre;
+    int maxMemberCount;
+    int nowMemberCount;
+    ChemistryType chemistryType;
+    PartyStatus status;
+    LocalDateTime createdAt;
 }

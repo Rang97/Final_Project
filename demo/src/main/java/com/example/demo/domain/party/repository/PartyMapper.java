@@ -16,9 +16,9 @@ public interface PartyMapper {
     // 파티 단건 조회
     public Party findById(Long partyId);
 
-    // 파티 전체 목록 조회
-    public List<PartyListResponse> findAllParty();
-
+    // 파티 목록 조회 (정렬 포함)
+    public List<PartyListResponse> findPartyList(@Param("sortBy") PartySortBy sortBy,
+                                                 @Param("ascending") boolean ascending);
     // 파티 생성
     public void insertParty(Party party);
 

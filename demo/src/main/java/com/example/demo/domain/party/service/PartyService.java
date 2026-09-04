@@ -103,10 +103,12 @@ public class PartyService {
 
     //======================================================================
 
-    // 파티 전체 목록 조회
-    public List<PartyListResponse> getPartyList() {
-        return partyMapper.findAllParty();
+    // 파티 목록 조회 (정렬 포함)
+    public List<PartyListResponse> getPartyList(PartySortBy sortBy, boolean ascending) {
+        return partyMapper.findPartyList(sortBy, ascending);
     }
+
+
 
 
 }

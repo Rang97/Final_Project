@@ -117,11 +117,17 @@ public class PartyController {
         return ResponseEntity.ok().build();
     }
 
-    // 파티 전체 목록 조회
+    // 파티 목록 조회 (정렬 포함)
     @GetMapping("/party-list")
-    public ResponseEntity<List<PartyListResponse>> getPartyList(){
-        List<PartyListResponse> parties = partyService.getPartyList();
+    public ResponseEntity<List<PartyListResponse>> getPartyList(
+            @RequestParam(required = false) PartySortBy sortBy,
+            @RequestParam(required = false, defaultValue = "true") boolean ascending
+    ){
+        List<PartyListResponse> parties = partyService.getPartyList(sortBy, ascending);
         return ResponseEntity.ok(parties);
     }
+
+
+
 
 }
