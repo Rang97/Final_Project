@@ -23,4 +23,7 @@ public interface PartyMemberMapper {
 
     // 파티 내부 APPROVED 멤버 userId 전체 목록
     List<Long> findApprovedMemberIds(@Param("partyId") Long partyId);
+
+    // 현재 유저가 APPROVED로 속한 파티 ID 조회
+    Long findActivePartyIdByUserId(@Param("userId") Long userId);
 }
