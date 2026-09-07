@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -37,6 +38,28 @@ class UserGameControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("success").value(true));
         verify(service).register(any(UserGameCreateRequest.class));
+    }
+
+    @Test
+    void listContainsAllGameFields() throws Exception {
+        when(service.getMyGames()).thenReturn(java.util.List.of(
+                new com.example.demo.domain.user.dto.UserGameResponse(10L, "게임", "https://example.com/cover.png", "RPG", true)));
+        mvc.perform(get("/api/users/me/games"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("success").value(true))
+                .andExpect(jsonPath("data[0].gameId").value(10))
+                .andExpect(jsonPath("data[0].name").value("게임"))
+                .andExpect(jsonPath("data[0].coverUrl").value("https://example.com/cover.png"))
+                .andExpect(jsonPath("data[0].genre").value("RPG"))
+                .andExpect(jsonPath("data[0].isMain").value(true));
+    }
+
+    @Test
+    void emptyListReturnsEmptyArray() throws Exception {
+        when(service.getMyGames()).thenReturn(java.util.List.of());
+        mvc.perform(get("/api/users/me/games"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("data").isEmpty());
     }
 
     @Test

@@ -1,6 +1,8 @@
 package com.example.demo.domain.user.controller;
 
 import com.example.demo.domain.user.dto.UserGameCreateRequest;
+import com.example.demo.domain.user.dto.UserGameResponse;
+import java.util.List;
 import com.example.demo.domain.user.service.UserGameService;
 import com.example.demo.global.common.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +29,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserGameController {
 
     private final UserGameService userGameService;
+
+    @GetMapping
+    @Operation(summary = "내 선호 게임 조회")
+    public ApiResponse<List<UserGameResponse>> getMyGames() {
+        return ApiResponse.success(userGameService.getMyGames());
+    }
 
     @PatchMapping("/{gameId}/main")
     @Operation(summary = "대표 게임 변경", description = "등록한 선호 게임 중 하나를 대표 게임으로 지정합니다.")

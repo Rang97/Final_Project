@@ -4,6 +4,14 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.demo.domain.user.repository.UserGameMapper">
 
+    <select id="findByUserId" resultType="com.example.demo.domain.user.dto.UserGameResponse">
+        SELECT g.game_id, g.name_ko AS name, g.cover_url, g.genre, ug.is_main
+        FROM user_game ug
+        JOIN game g ON g.game_id = ug.game_id
+        WHERE ug.user_id = #{userId}
+        ORDER BY ug.is_main DESC, ug.user_game_id ASC
+    </select>
+
     <select id="lockUserById" resultType="java.lang.Long" useCache="false" flushCache="true">
         SELECT user_id FROM `user` WHERE user_id = #{userId} FOR UPDATE
     </select>

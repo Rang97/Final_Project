@@ -51,6 +51,15 @@ class UserGameServiceTest {
     }
 
     @Test
+    void listUsesAuthenticatedUserId() {
+        var games = java.util.List.of(new com.example.demo.domain.user.dto.UserGameResponse(10L, "게임", null, "RPG", true));
+        when(mapper.findByUserId(7L)).thenReturn(games);
+        assertThat(service.getMyGames()).isEqualTo(games);
+        verify(mapper).findByUserId(7L);
+        verifyNoMoreInteractions(mapper);
+    }
+
+    @Test
     void missingGameIsNotSaved() {
         assertFailure(HttpStatus.NOT_FOUND);
         verify(mapper, never()).countByUserId(anyLong());

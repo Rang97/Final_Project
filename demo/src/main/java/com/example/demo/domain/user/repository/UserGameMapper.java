@@ -2,9 +2,13 @@ package com.example.demo.domain.user.repository;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import com.example.demo.domain.user.dto.UserGameResponse;
+import java.util.List;
 
 @Mapper
 public interface UserGameMapper {
+
+    List<UserGameResponse> findByUserId(@Param("userId") Long userId);
 
     Long lockUserById(@Param("userId") Long userId);
 

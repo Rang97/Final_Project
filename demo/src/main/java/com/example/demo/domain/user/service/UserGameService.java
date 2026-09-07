@@ -2,6 +2,8 @@ package com.example.demo.domain.user.service;
 
 import com.example.demo.global.util.CurrentUserProvider;
 import com.example.demo.domain.user.dto.UserGameCreateRequest;
+import com.example.demo.domain.user.dto.UserGameResponse;
+import java.util.List;
 import com.example.demo.domain.user.repository.UserGameMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
@@ -21,6 +23,11 @@ public class UserGameService {
 
     public Long getCurrentUserId() {
         return currentUserProvider.getCurrentUserId();
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserGameResponse> getMyGames() {
+        return userGameMapper.findByUserId(getCurrentUserId());
     }
 
     @Transactional
