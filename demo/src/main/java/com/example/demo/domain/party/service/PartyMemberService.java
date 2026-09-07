@@ -22,6 +22,7 @@ public class PartyMemberService {
     private final PartyMapper partyMapper;
     private final PartyMemberMapper partyMemberMapper;
     private final SajuMapper sajuMapper;
+    private final PartyChatNotifier partyChatNotifier;
 
 
     // 파티 참가
@@ -52,6 +53,8 @@ public class PartyMemberService {
         } else {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "가입할 수 없는 파티입니다.");
         }
+        // 시스템 메시지 출력
+        partyChatNotifier.notifySystemMessage(partyId, userId, "입장했습니다.");
     }
 
     // 파티 떠나기
@@ -72,6 +75,8 @@ public class PartyMemberService {
         if (party.getStatus() == PartyStatus.FULL){
             partyMapper.updateStatus(partyId, PartyStatus.RECRUITING);
         }
+        // 시스템 메시지 출력
+        partyChatNotifier.notifySystemMessage(partyId, userId, "퇴장했습니다.");
     }
 
 }

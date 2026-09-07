@@ -29,6 +29,7 @@ public class PartyService {
     private final PartyMemberMapper partyMemberMapper;
     private final SajuMapper sajuMapper;
     private final ChemistryService chemistryService;
+    private final PartyChatNotifier partyChatNotifier;
 
     // <방장>
     // 파티 생성
@@ -102,6 +103,9 @@ public class PartyService {
         if (party.getStatus() == PartyStatus.FULL){
             partyMapper.updateStatus(partyId, PartyStatus.RECRUITING);
         }
+
+        // 9. 시스템 메시지 출력
+        partyChatNotifier.notifySystemMessage(partyId, targetUserId, "추방되었습니다.");
     }
 
     //======================================================================
