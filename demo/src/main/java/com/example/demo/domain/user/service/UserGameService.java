@@ -25,7 +25,7 @@ public class UserGameService {
 
     @Transactional
     public void changeMainGame(Long gameId) {
-        Long userId = getCurrentUserId();
+        Long userId = lockCurrentUser();
         if (!userGameMapper.existsByUserIdAndGameId(userId, gameId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "등록한 선호 게임을 찾을 수 없습니다.");
         }
@@ -38,7 +38,7 @@ public class UserGameService {
 
     @Transactional
     public void delete(Long gameId) {
-        Long userId = getCurrentUserId();
+        Long userId = lockCurrentUser();
         if (userGameMapper.deleteByUserIdAndGameId(userId, gameId) != 1) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "등록한 선호 게임을 찾을 수 없습니다.");
         }
@@ -46,7 +46,7 @@ public class UserGameService {
 
     @Transactional
     public void register(UserGameCreateRequest request) {
-        Long userId = getCurrentUserId();
+        Long userId = lockCurrentUser();
         Long gameId = request.getGameId();
 
         if (!userGameMapper.existsGame(gameId)) {
@@ -64,5 +64,13 @@ public class UserGameService {
         } catch (DuplicateKeyException exception) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 등록한 게임입니다.", exception);
         }
+    }
+    // 모든 변경은 같은 사용자 행을 먼저 잠그고, 트랜잭션 종료까지 잠금을 유지한다.
+    private Long lockCurrentUser() {
+        Long userId = getCurrentUserId();
+        if (userGameMapper.lockUserById(userId) == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다.");
+        }
+        return userId;
     }
 }

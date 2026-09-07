@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface UserGameMapper {
 
+    Long lockUserById(@Param("userId") Long userId);
+
     boolean existsGame(@Param("gameId") Long gameId);
 
     boolean existsByUserIdAndGameId(@Param("userId") Long userId, @Param("gameId") Long gameId);

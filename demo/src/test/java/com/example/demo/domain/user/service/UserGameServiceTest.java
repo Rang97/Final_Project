@@ -6,6 +6,9 @@ import com.example.demo.global.util.CurrentUserProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -29,6 +32,7 @@ class UserGameServiceTest {
         service = new UserGameService(currentUserProvider, mapper);
         request = new ObjectMapper().readValue("{\"gameId\":10}", UserGameCreateRequest.class);
         when(currentUserProvider.getCurrentUserId()).thenReturn(7L);
+        when(mapper.lockUserById(7L)).thenReturn(7L);
     }
 
     @Test
@@ -38,7 +42,12 @@ class UserGameServiceTest {
 
         service.register(request);
 
-        verify(mapper).insert(7L, 10L);
+        var order = inOrder(mapper);
+        order.verify(mapper).lockUserById(7L);
+        order.verify(mapper).existsGame(10L);
+        order.verify(mapper).existsByUserIdAndGameId(7L, 10L);
+        order.verify(mapper).countByUserId(7L);
+        order.verify(mapper).insert(7L, 10L);
     }
 
     @Test
@@ -90,6 +99,7 @@ class UserGameServiceTest {
         service.changeMainGame(10L);
 
         var order = inOrder(mapper);
+        order.verify(mapper).lockUserById(7L);
         order.verify(mapper).existsByUserIdAndGameId(7L, 10L);
         order.verify(mapper).clearMainByUserId(7L);
         order.verify(mapper).setMain(7L, 10L);
@@ -122,7 +132,9 @@ class UserGameServiceTest {
 
         service.delete(10L);
 
-        verify(mapper).deleteByUserIdAndGameId(7L, 10L);
+        var order = inOrder(mapper);
+        order.verify(mapper).lockUserById(7L);
+        order.verify(mapper).deleteByUserIdAndGameId(7L, 10L);
         verifyNoMoreInteractions(mapper);
     }
 
@@ -140,6 +152,40 @@ class UserGameServiceTest {
         assertThatThrownBy(() -> service.changeMainGame(10L)).isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> service.delete(10L)).isInstanceOf(IllegalArgumentException.class);
         verifyNoInteractions(mapper);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"register", "delete", "changeMainGame"})
+    void missingUserStopsOperationBeforeGameAccess(String operation) {
+        when(mapper.lockUserById(7L)).thenReturn(null);
+
+        assertThatThrownBy(() -> invokeOperation(operation))
+                .isInstanceOfSatisfying(ResponseStatusException.class,
+                        exception -> assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND));
+
+        verify(mapper).lockUserById(7L);
+        verifyNoMoreInteractions(mapper);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"register", "delete", "changeMainGame"})
+    void lockFailureStopsOperationBeforeGameAccess(String operation) {
+        var failure = new CannotAcquireLockException("lock timeout");
+        when(mapper.lockUserById(7L)).thenThrow(failure);
+
+        assertThatThrownBy(() -> invokeOperation(operation)).isSameAs(failure);
+
+        verify(mapper).lockUserById(7L);
+        verifyNoMoreInteractions(mapper);
+    }
+
+    private void invokeOperation(String operation) {
+        switch (operation) {
+            case "register" -> service.register(request);
+            case "delete" -> service.delete(10L);
+            case "changeMainGame" -> service.changeMainGame(10L);
+            default -> throw new IllegalArgumentException(operation);
+        }
     }
 
     private void assertFailure(HttpStatus status) {
