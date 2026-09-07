@@ -22,4 +22,15 @@
         INSERT INTO user_game (user_id, game_id)
         VALUES (#{userId}, #{gameId})
     </insert>
+    <update id="clearMainByUserId">
+        UPDATE user_game SET is_main = FALSE WHERE user_id = #{userId} AND is_main = TRUE
+    </update>
+
+    <update id="setMain">
+        UPDATE user_game SET is_main = TRUE WHERE user_id = #{userId} AND game_id = #{gameId}
+    </update>
+
+    <delete id="deleteByUserIdAndGameId">
+        DELETE FROM user_game WHERE user_id = #{userId} AND game_id = #{gameId}
+    </delete>
 </mapper>

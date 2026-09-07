@@ -82,6 +82,66 @@ class UserGameServiceTest {
         verifyNoInteractions(mapper);
     }
 
+    @Test
+    void mainGameChangeClearsPreviousSelectionBeforeSettingNewOne() {
+        when(mapper.existsByUserIdAndGameId(7L, 10L)).thenReturn(true);
+        when(mapper.setMain(7L, 10L)).thenReturn(1);
+
+        service.changeMainGame(10L);
+
+        var order = inOrder(mapper);
+        order.verify(mapper).existsByUserIdAndGameId(7L, 10L);
+        order.verify(mapper).clearMainByUserId(7L);
+        order.verify(mapper).setMain(7L, 10L);
+        verifyNoMoreInteractions(mapper);
+    }
+
+    @Test
+    void unregisteredGameCannotClearExistingMainGame() {
+        assertThatThrownBy(() -> service.changeMainGame(10L))
+                .isInstanceOfSatisfying(ResponseStatusException.class,
+                        exception -> assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND));
+        verify(mapper, never()).clearMainByUserId(anyLong());
+        verify(mapper, never()).setMain(anyLong(), anyLong());
+    }
+
+    @Test
+    void failedMainAssignmentThrowsToTriggerTransactionRollback() {
+        when(mapper.existsByUserIdAndGameId(7L, 10L)).thenReturn(true);
+        when(mapper.setMain(7L, 10L)).thenReturn(0);
+
+        assertThatThrownBy(() -> service.changeMainGame(10L))
+                .isInstanceOfSatisfying(ResponseStatusException.class,
+                        exception -> assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND));
+        verify(mapper).clearMainByUserId(7L);
+    }
+
+    @Test
+    void deletingGameDoesNotAssignAnotherMainGame() {
+        when(mapper.deleteByUserIdAndGameId(7L, 10L)).thenReturn(1);
+
+        service.delete(10L);
+
+        verify(mapper).deleteByUserIdAndGameId(7L, 10L);
+        verifyNoMoreInteractions(mapper);
+    }
+
+    @Test
+    void deletingUnregisteredGameReturnsNotFound() {
+        assertThatThrownBy(() -> service.delete(10L))
+                .isInstanceOfSatisfying(ResponseStatusException.class,
+                        exception -> assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND));
+    }
+
+    @Test
+    void unauthenticatedMainChangeAndDeleteDoNotAccessDatabase() {
+        when(currentUserProvider.getCurrentUserId()).thenThrow(new IllegalArgumentException("로그인이 필요합니다."));
+
+        assertThatThrownBy(() -> service.changeMainGame(10L)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> service.delete(10L)).isInstanceOf(IllegalArgumentException.class);
+        verifyNoInteractions(mapper);
+    }
+
     private void assertFailure(HttpStatus status) {
         assertThatThrownBy(() -> service.register(request))
                 .isInstanceOfSatisfying(ResponseStatusException.class,

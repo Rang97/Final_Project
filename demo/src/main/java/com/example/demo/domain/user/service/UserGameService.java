@@ -24,6 +24,27 @@ public class UserGameService {
     }
 
     @Transactional
+    public void changeMainGame(Long gameId) {
+        Long userId = getCurrentUserId();
+        if (!userGameMapper.existsByUserIdAndGameId(userId, gameId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "등록한 선호 게임을 찾을 수 없습니다.");
+        }
+
+        userGameMapper.clearMainByUserId(userId);
+        if (userGameMapper.setMain(userId, gameId) != 1) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "등록한 선호 게임을 찾을 수 없습니다.");
+        }
+    }
+
+    @Transactional
+    public void delete(Long gameId) {
+        Long userId = getCurrentUserId();
+        if (userGameMapper.deleteByUserIdAndGameId(userId, gameId) != 1) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "등록한 선호 게임을 찾을 수 없습니다.");
+        }
+    }
+
+    @Transactional
     public void register(UserGameCreateRequest request) {
         Long userId = getCurrentUserId();
         Long gameId = request.getGameId();

@@ -10,6 +10,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -23,6 +26,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserGameController {
 
     private final UserGameService userGameService;
+
+    @PatchMapping("/{gameId}/main")
+    @Operation(summary = "대표 게임 변경", description = "등록한 선호 게임 중 하나를 대표 게임으로 지정합니다.")
+    public ApiResponse<Void> changeMainGame(@PathVariable Long gameId) {
+        userGameService.changeMainGame(gameId);
+        return ApiResponse.success();
+    }
+
+    @DeleteMapping("/{gameId}")
+    @Operation(summary = "선호 게임 삭제", description = "대표 게임 삭제 시 다른 게임을 자동으로 대표 지정하지 않습니다.")
+    public ApiResponse<Void> delete(@PathVariable Long gameId) {
+        userGameService.delete(gameId);
+        return ApiResponse.success();
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

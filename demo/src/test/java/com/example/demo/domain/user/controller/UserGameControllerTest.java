@@ -14,6 +14,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class UserGameControllerTest {
@@ -35,6 +37,30 @@ class UserGameControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("success").value(true));
         verify(service).register(any(UserGameCreateRequest.class));
+    }
+
+    @Test
+    void mainGameChangeReturnsSuccess() throws Exception {
+        mvc.perform(patch("/api/users/me/games/10/main"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("success").value(true));
+        verify(service).changeMainGame(10L);
+    }
+
+    @Test
+    void deleteReturnsSuccess() throws Exception {
+        mvc.perform(delete("/api/users/me/games/10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("success").value(true));
+        verify(service).delete(10L);
+    }
+
+    @Test
+    void unregisteredMainGameReturnsNotFound() throws Exception {
+        doThrow(new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND))
+                .when(service).changeMainGame(10L);
+        mvc.perform(patch("/api/users/me/games/10/main"))
+                .andExpect(status().isNotFound());
     }
 
     @ParameterizedTest

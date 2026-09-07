@@ -13,4 +13,10 @@ public interface UserGameMapper {
     int countByUserId(@Param("userId") Long userId);
 
     int insert(@Param("userId") Long userId, @Param("gameId") Long gameId);
+
+    int clearMainByUserId(@Param("userId") Long userId);
+
+    int setMain(@Param("userId") Long userId, @Param("gameId") Long gameId);
+
+    int deleteByUserIdAndGameId(@Param("userId") Long userId, @Param("gameId") Long gameId);
 }
