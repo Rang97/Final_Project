@@ -37,6 +37,9 @@ public class PartyMemberService {
         if (party.getStatus() == PartyStatus.RECRUITING && party.getNowMemberCount() < party.getMaxMemberCount()) {
             PartyMember existing = partyMemberMapper.findByPartyIdAndUserId(partyId, userId);
             // 새로 가입한 경우 -> insert
+            if (existing != null && existing.getStatus() == PartyMemberStatus.APPROVED) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 가입된 파티입니다.");
+            }
             if (existing == null) {
                 PartyMember newMember = new PartyMember(partyId, userId, PartyMemberStatus.APPROVED);
                 partyMemberMapper.insertPartyMember(newMember);
