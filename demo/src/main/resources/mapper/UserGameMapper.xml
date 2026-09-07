@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.domain.user.repository.UserGameMapper">
+
+    <select id="existsGame" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM game WHERE game_id = #{gameId})
+    </select>
+
+    <select id="existsByUserIdAndGameId" resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1 FROM user_game WHERE user_id = #{userId} AND game_id = #{gameId}
+        )
+    </select>
+
+    <select id="countByUserId" resultType="int">
+        SELECT COUNT(*) FROM user_game WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO user_game (user_id, game_id)
+        VALUES (#{userId}, #{gameId})
+    </insert>
+</mapper>
