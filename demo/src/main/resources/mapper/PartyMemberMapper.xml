@@ -21,4 +21,12 @@
         UPDATE party_member SET status = #{status}
         WHERE party_member_id = #{partyMemberId}
     </update>
+
+    <!--  파티 내부 APPROVED 멤버 userId 전체 목록  -->
+    <select id="findApprovedMemberIds" resultType="Long">
+        SELECT user_id
+        FROM party_member
+        WHERE party_id = #{partyId} AND status = 'APPROVED'
+    </select>
+
 </mapper>
