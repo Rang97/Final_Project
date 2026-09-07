@@ -116,7 +116,7 @@ public class PartyService {
     }
 
     // 파티 목록 조회 (정렬 포함)
-    public List<PartyListResponse> getPartyList(PartySortBy sortBy, boolean ascending, AuthenticatedUser user) {
+    public List<PartyListResponse> getPartyList(PartySortBy sortBy, boolean ascending, AuthenticatedUser user, Long gameId) {
         PartySortBy resolvedSortBy = sortBy;
 
         // 정렬 기준이 사주 궁합인 경우
@@ -124,7 +124,7 @@ public class PartyService {
             resolvedSortBy = resolvedSortBy(user.userId());
         }
 
-        List<PartyListResponse> parties = partyMapper.findPartyList(resolvedSortBy, ascending);
+        List<PartyListResponse> parties = partyMapper.findPartyList(resolvedSortBy, ascending, gameId);
 
         // 오행 기준 정렬
         if (resolvedSortBy != null && resolvedSortBy.isElement()){

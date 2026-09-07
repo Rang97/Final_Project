@@ -15,6 +15,9 @@
         SELECT p.*, g.name_ko AS gameName, g.genre AS genre
         FROM party p
         JOIN game g ON p.game_id = g.game_id
+        <where>
+            <if test="gameId != null">p.game_id = #{gameId}</if>
+        </where>
         <choose>
             <when test="sortBy != null and sortBy.name() == 'TITLE'">
                 ORDER BY g.name_ko <if test="ascending">ASC</if><if test="!ascending">DESC</if>

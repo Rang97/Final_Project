@@ -138,9 +138,11 @@ public class PartyController {
             @RequestParam(required = false) PartySortBy sortBy,
             @Parameter(description = "오름차순 여부", example = "true")
             @RequestParam(required = false, defaultValue = "true") boolean ascending,
-            @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser user
+            @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser user,
+            @Parameter(description = "게임 ID 필터, 비우면 전체")
+            @RequestParam(required = false) Long gameId
     ){
-        List<PartyListResponse> parties = partyService.getPartyList(sortBy, ascending, user);
+        List<PartyListResponse> parties = partyService.getPartyList(sortBy, ascending, user, gameId);
         return ResponseEntity.ok(parties);
     }
 
