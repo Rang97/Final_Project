@@ -129,7 +129,11 @@ public class PartyService {
         }
 
         partyMapper.updateParty(party);
+
+        // 시스템 메시지 출력
+        partyChatNotifier.notifySystemMessage(partyId, userId, "파티 정보를 수정했습니다.");
         return party;
+
 
     }
 
