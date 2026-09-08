@@ -39,6 +39,9 @@ public class PartyService {
         if (sajuMapper.findElementsByUserId(List.of(userId)).isEmpty()){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "사주 정보를 등록해야 파티를 생성할 수 있습니다.");
         }
+        if (partyMemberMapper.findActivePartyIdByUserId(userId) != null){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 참여 중인 파티가 있어 새 파티를 생성할 수 없습니다.");
+        }
 
         // 파티 객체 조립
         Party party = new Party(userId,

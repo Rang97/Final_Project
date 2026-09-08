@@ -28,6 +28,7 @@ public class StompAuthInterceptor implements ChannelInterceptor {
 
     private final JwtProvider jwtProvider;
     private final PartyMemberMapper partyMemberMapper;
+    private final StompSessionRegistry sessionRegistry;
 
     // 클라이언트가 보내는 모든 STOMP 프레임이 여기를 거쳐감 (CONNECT, SEND, SUBSCRIBE)
     @Override
@@ -59,6 +60,10 @@ public class StompAuthInterceptor implements ChannelInterceptor {
             Long userId = Long.valueOf(claims.getSubject());
             String loginId = claims.get("loginId", String.class);
             String role = claims.get("role", String.class);
+
+            if (!sessionRegistry.tryConnect(userId, accessor.getSessionId())) {
+                throw new MessagingException("이미 다른 채팅에서 접속 중입니다.");
+            }
 
             // 꺼낸 정보로 유저 객체(AuthenticatedUser) 조립
             AuthenticatedUser principal = new AuthenticatedUser(userId, loginId, role);

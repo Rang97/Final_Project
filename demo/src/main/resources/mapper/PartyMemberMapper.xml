@@ -29,4 +29,12 @@
         WHERE party_id = #{partyId} AND status = 'APPROVED'
     </select>
 
+    <!--  유저가 현재 APPROVED로 속한 파티 ID 조회  -->
+    <select id="findActivePartyIdByUserId" resultType="Long">
+        SELECT party_id
+        FROM party_member
+        WHERE user_id = #{userId} AND status = 'APPROVED'
+        LIMIT 1
+    </select>
+
 </mapper>

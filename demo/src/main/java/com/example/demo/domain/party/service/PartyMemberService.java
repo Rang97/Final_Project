@@ -32,10 +32,17 @@ public class PartyMemberService {
         if (sajuMapper.findElementsByUserId(List.of(userId)).isEmpty()){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "사주 정보를 등록해야 파티에 가입할 수 있습니다.");
         }
+        Long activePartyId = partyMemberMapper.findActivePartyIdByUserId(userId);
+        if (activePartyId != null && !activePartyId.equals(partyId)){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 다른 파티에 참여 중입니다.");
+        }
         Party party = partyMapper.findById(partyId);
 
         if (party.getStatus() == PartyStatus.RECRUITING && party.getNowMemberCount() < party.getMaxMemberCount()) {
             PartyMember existing = partyMemberMapper.findByPartyIdAndUserId(partyId, userId);
+            if (existing != null && existing.getStatus() == PartyMemberStatus.APPROVED) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 가입된 파티입니다.");
+            }
             // 새로 가입한 경우 -> insert
             if (existing != null && existing.getStatus() == PartyMemberStatus.APPROVED) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 가입된 파티입니다.");

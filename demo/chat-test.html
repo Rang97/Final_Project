@@ -150,6 +150,7 @@ function connect(id) {
     connectHeaders: { Authorization: 'Bearer ' + state[id].token },
     reconnectDelay: 0,
     onConnect: () => {
+      state[id].client = client;
       document.getElementById('connStatus-' + id).textContent = '연결됨, 구독 시도중...';
       log(id, 'CONNECT 성공');
 
@@ -175,7 +176,6 @@ function connect(id) {
   });
 
   client.activate();
-  state[id].client = client;
 }
 
 function disconnect(id) {
