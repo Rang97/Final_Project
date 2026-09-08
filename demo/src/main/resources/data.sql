@@ -5,26 +5,26 @@
 -- =========================
 -- 1. GAME_TAG
 -- =========================
-INSERT INTO game_tag (name)
-VALUES ('PVP'),
-       ('COOP'),
-       ('TEAM'),
-       ('COMPETITIVE'),
-       ('CASUAL'),
-       ('SURVIVAL'),
-       ('BATTLE_ROYALE'),
-       ('MMORPG'),
-       ('MOBA'),
-       ('FPS'),
-       ('TPS'),
-       ('SPORTS'),
-       ('PARTY'),
-       ('STRATEGY'),
-       ('PUZZLE'),
-       ('HORROR'),
-       ('SANDBOX'),
-       ('RAID'),
-       ('OPEN_WORLD');
+INSERT INTO game_tag (name) VALUES
+('PVP'),
+('COOP'),
+('TEAM'),
+('COMPETITIVE'),
+('CASUAL'),
+('SURVIVAL'),
+('BATTLE_ROYALE'),
+('MMORPG'),
+('MOBA'),
+('FPS'),
+('TPS'),
+('SPORTS'),
+('PARTY'),
+('STRATEGY'),
+('PUZZLE'),
+('HORROR'),
+('SANDBOX'),
+('RAID'),
+('OPEN_WORLD');
 
 -- =========================
 -- 2. GAME (51개)
@@ -165,350 +165,350 @@ VALUES ('리그 오브 레전드',
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'MOBA')
+JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'MOBA')
 WHERE g.name_ko = '리그 오브 레전드';
 
 -- 발로란트
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'FPS')
+JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'FPS')
 WHERE g.name_ko = '발로란트';
 
 -- 오버워치 2
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'FPS')
+JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'FPS')
 WHERE g.name_ko = '오버워치 2';
 
 -- PUBG: 배틀그라운드
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'BATTLE_ROYALE', 'TPS')
+JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'BATTLE_ROYALE', 'TPS')
 WHERE g.name_ko = 'PUBG: 배틀그라운드';
 
 -- 에이펙스 레전드
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'BATTLE_ROYALE', 'FPS')
+JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'BATTLE_ROYALE', 'FPS')
 WHERE g.name_ko = '에이펙스 레전드';
 
 -- 카운터 스트라이크 2
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'FPS')
+JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'FPS')
 WHERE g.name_ko = '카운터 스트라이크 2';
 
 -- 레인보우 식스 시즈
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'FPS', 'STRATEGY')
+JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'FPS', 'STRATEGY')
 WHERE g.name_ko = '레인보우 식스 시즈';
 
 -- 마블 라이벌즈
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'TPS')
+JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'TPS')
 WHERE g.name_ko = '마블 라이벌즈';
 
 -- 포트나이트
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'BATTLE_ROYALE', 'TPS', 'CASUAL')
+JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'BATTLE_ROYALE', 'TPS', 'CASUAL')
 WHERE g.name_ko = '포트나이트';
 
 -- 도타 2
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'MOBA')
+JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'MOBA')
 WHERE g.name_ko = '도타 2';
 
 -- 더 파이널스
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'FPS')
+JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'FPS')
 WHERE g.name_ko = '더 파이널스';
 
 -- 델타 포스
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'FPS')
+JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'FPS')
 WHERE g.name_ko = '델타 포스';
 
 -- 콜 오브 듀티: 워존
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'BATTLE_ROYALE', 'FPS')
+JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'BATTLE_ROYALE', 'FPS')
 WHERE g.name_ko = '콜 오브 듀티: 워존';
 
 -- 배틀필드 2042
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'FPS')
+JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'FPS')
 WHERE g.name_ko = '배틀필드 2042';
 
 -- 팀 포트리스 2
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'FPS', 'CASUAL')
+JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'FPS', 'CASUAL')
 WHERE g.name_ko = '팀 포트리스 2';
 
 -- 헬다이버즈 2
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'TPS')
+JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'TPS')
 WHERE g.name_ko = '헬다이버즈 2';
 
 -- 워프레임
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'TPS', 'OPEN_WORLD')
+JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'TPS', 'OPEN_WORLD')
 WHERE g.name_ko = '워프레임';
 
 -- 데스티니 2
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'PVP', 'TEAM', 'FPS', 'RAID')
+JOIN game_tag t ON t.name IN ('COOP', 'PVP', 'TEAM', 'FPS', 'RAID')
 WHERE g.name_ko = '데스티니 2';
 
 -- 딥 락 갤럭틱
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'FPS')
+JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'FPS')
 WHERE g.name_ko = '딥 락 갤럭틱';
 
 -- 레프트 4 데드 2
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'FPS', 'HORROR')
+JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'FPS', 'HORROR')
 WHERE g.name_ko = '레프트 4 데드 2';
 
 -- 백 4 블러드
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'FPS', 'HORROR')
+JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'FPS', 'HORROR')
 WHERE g.name_ko = '백 4 블러드';
 
 -- 레디 오어 낫
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'FPS', 'STRATEGY')
+JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'FPS', 'STRATEGY')
 WHERE g.name_ko = '레디 오어 낫';
 
 -- 데드 바이 데이라이트
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('PVP', 'COOP', 'HORROR')
+JOIN game_tag t ON t.name IN ('PVP', 'COOP', 'HORROR')
 WHERE g.name_ko = '데드 바이 데이라이트';
 
 -- 로스트아크
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'MMORPG', 'RAID')
+JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'MMORPG', 'RAID')
 WHERE g.name_ko = '로스트아크';
 
 -- 메이플스토리
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'MMORPG', 'CASUAL')
+JOIN game_tag t ON t.name IN ('COOP', 'MMORPG', 'CASUAL')
 WHERE g.name_ko = '메이플스토리';
 
 -- 던전앤파이터
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'RAID')
+JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'RAID')
 WHERE g.name_ko = '던전앤파이터';
 
 -- 월드 오브 워크래프트
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'PVP', 'TEAM', 'MMORPG', 'RAID')
+JOIN game_tag t ON t.name IN ('COOP', 'PVP', 'TEAM', 'MMORPG', 'RAID')
 WHERE g.name_ko = '월드 오브 워크래프트';
 
 -- 파이널 판타지 XIV
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'MMORPG', 'RAID')
+JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'MMORPG', 'RAID')
 WHERE g.name_ko = '파이널 판타지 XIV';
 
 -- 검은사막
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'PVP', 'MMORPG', 'OPEN_WORLD')
+JOIN game_tag t ON t.name IN ('COOP', 'PVP', 'MMORPG', 'OPEN_WORLD')
 WHERE g.name_ko = '검은사막';
 
 -- 길드워 2
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'PVP', 'TEAM', 'MMORPG', 'OPEN_WORLD')
+JOIN game_tag t ON t.name IN ('COOP', 'PVP', 'TEAM', 'MMORPG', 'OPEN_WORLD')
 WHERE g.name_ko = '길드워 2';
 
 -- 마인크래프트
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'CASUAL', 'SANDBOX', 'SURVIVAL')
+JOIN game_tag t ON t.name IN ('COOP', 'CASUAL', 'SANDBOX', 'SURVIVAL')
 WHERE g.name_ko = '마인크래프트';
 
 -- 로블록스
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'PVP', 'CASUAL', 'SANDBOX', 'PARTY')
+JOIN game_tag t ON t.name IN ('COOP', 'PVP', 'CASUAL', 'SANDBOX', 'PARTY')
 WHERE g.name_ko = '로블록스';
 
 -- 러스트
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('PVP', 'COOP', 'SURVIVAL', 'SANDBOX', 'OPEN_WORLD')
+JOIN game_tag t ON t.name IN ('PVP', 'COOP', 'SURVIVAL', 'SANDBOX', 'OPEN_WORLD')
 WHERE g.name_ko = '러스트';
 
 -- 팰월드
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'SURVIVAL', 'OPEN_WORLD')
+JOIN game_tag t ON t.name IN ('COOP', 'SURVIVAL', 'OPEN_WORLD')
 WHERE g.name_ko = '팰월드';
 
 -- 프로젝트 좀보이드
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'SURVIVAL', 'HORROR', 'OPEN_WORLD')
+JOIN game_tag t ON t.name IN ('COOP', 'SURVIVAL', 'HORROR', 'OPEN_WORLD')
 WHERE g.name_ko = '프로젝트 좀보이드';
 
 -- 테라리아
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'CASUAL', 'SANDBOX', 'OPEN_WORLD')
+JOIN game_tag t ON t.name IN ('COOP', 'CASUAL', 'SANDBOX', 'OPEN_WORLD')
 WHERE g.name_ko = '테라리아';
 
 -- 스타듀 밸리
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'CASUAL')
+JOIN game_tag t ON t.name IN ('COOP', 'CASUAL')
 WHERE g.name_ko = '스타듀 밸리';
 
 -- 돈 스타브 투게더
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'SURVIVAL')
+JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'SURVIVAL')
 WHERE g.name_ko = '돈 스타브 투게더';
 
 -- 발헤임
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'SURVIVAL', 'OPEN_WORLD')
+JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'SURVIVAL', 'OPEN_WORLD')
 WHERE g.name_ko = '발헤임';
 
 -- 래프트
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'SURVIVAL')
+JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'SURVIVAL')
 WHERE g.name_ko = '래프트';
 
 -- 그라운디드
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'SURVIVAL', 'OPEN_WORLD')
+JOIN game_tag t ON t.name IN ('COOP', 'TEAM', 'SURVIVAL', 'OPEN_WORLD')
 WHERE g.name_ko = '그라운디드';
 
 -- 노 맨즈 스카이
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'CASUAL', 'OPEN_WORLD')
+JOIN game_tag t ON t.name IN ('COOP', 'CASUAL', 'OPEN_WORLD')
 WHERE g.name_ko = '노 맨즈 스카이';
 
 -- 씨 오브 시브즈
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'PVP', 'TEAM', 'OPEN_WORLD')
+JOIN game_tag t ON t.name IN ('COOP', 'PVP', 'TEAM', 'OPEN_WORLD')
 WHERE g.name_ko = '씨 오브 시브즈';
 
 -- 몬스터 헌터 와일즈
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'TEAM')
+JOIN game_tag t ON t.name IN ('COOP', 'TEAM')
 WHERE g.name_ko = '몬스터 헌터 와일즈';
 
 -- 몬스터 헌터: 월드
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'TEAM')
+JOIN game_tag t ON t.name IN ('COOP', 'TEAM')
 WHERE g.name_ko = '몬스터 헌터: 월드';
 
 -- 엘든 링
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('COOP', 'PVP', 'OPEN_WORLD')
+JOIN game_tag t ON t.name IN ('COOP', 'PVP', 'OPEN_WORLD')
 WHERE g.name_ko = '엘든 링';
 
 -- EA SPORTS FC 26
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'SPORTS')
+JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'SPORTS')
 WHERE g.name_ko = 'EA SPORTS FC 26';
 
 -- FC 온라인
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('PVP', 'COMPETITIVE', 'SPORTS')
+JOIN game_tag t ON t.name IN ('PVP', 'COMPETITIVE', 'SPORTS')
 WHERE g.name_ko = 'FC 온라인';
 
 -- 로켓 리그
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'SPORTS')
+JOIN game_tag t ON t.name IN ('PVP', 'TEAM', 'COMPETITIVE', 'SPORTS')
 WHERE g.name_ko = '로켓 리그';
 
 -- 철권 8
 INSERT INTO game_tag_map (game_id, tag_id)
 SELECT g.game_id, t.tag_id
 FROM game g
-         JOIN game_tag t ON t.name IN ('PVP', 'COMPETITIVE')
+JOIN game_tag t ON t.name IN ('PVP', 'COMPETITIVE')
 WHERE g.name_ko = '철권 8';
 
 -- 마비노기 모바일
