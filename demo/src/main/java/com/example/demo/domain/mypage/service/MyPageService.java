@@ -1,14 +1,15 @@
-// domain/mypage/service/MyPageService.java
 package com.example.demo.domain.mypage.service;
 
 import com.example.demo.domain.mypage.dto.MyPageSajuResponse;
-import com.example.demo.domain.mypage.util.ElementStyleMapper;
+import com.example.demo.domain.mypage.dto.MyPageSummaryResponse;
 import com.example.demo.domain.saju.dto.SajuInputRequest;
+import com.example.demo.domain.saju.dto.SajuInputResponse;
 import com.example.demo.domain.saju.dto.SajuResponse;
 import com.example.demo.domain.saju.repository.SajuMapper;
 import com.example.demo.domain.saju.service.SajuCalculationService;
 import com.example.demo.domain.saju.service.SajuInputService;
 import com.example.demo.domain.saju.util.FiveElement;
+import com.example.demo.domain.user.service.UserGameService;
 import com.example.demo.global.util.CurrentUserProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,15 +25,19 @@ public class MyPageService {
     private final SajuInputService sajuInputService;
     private final SajuCalculationService sajuCalculationService;
     private final SajuMapper sajuMapper;
+    private final UserGameService userGameService;   // 추가
     private final CurrentUserProvider currentUserProvider;
 
     @Transactional
-    public MyPageSajuResponse updateBirthInfo(SajuInputRequest request) {
+    public SajuInputResponse updateBirthInfo(SajuInputRequest request) {
         Long userId = currentUserProvider.getCurrentUserId();
+        return sajuInputService.saveOrUpdate(userId, request);
+    }
 
-        sajuInputService.saveOrUpdate(userId, request);
+    @Transactional
+    public MyPageSajuResponse calculateSaju() {
+        Long userId = currentUserProvider.getCurrentUserId();
         SajuResponse sajuResponse = sajuCalculationService.calculate(userId);
-
         return buildResponse(sajuResponse);
     }
 
@@ -40,9 +45,22 @@ public class MyPageService {
         Long userId = currentUserProvider.getCurrentUserId();
 
         var saju = sajuMapper.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("등록된 사주 정보가 없습니다. 생년월일시를 먼저 입력해주세요."));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "등록된 사주 정보가 없습니다. 생년월일시를 먼저 입력해주세요."));
 
         return buildResponse(SajuResponse.from(saju));
+    }
+
+    //마이페이지 사주 정보 + 선호 게임 목록
+    public MyPageSummaryResponse getMyPageSummary() {
+        MyPageSajuResponse saju = null;
+        try {
+            saju = getMySaju();
+        } catch (IllegalArgumentException e) {
+            // 사주 정보 없음 - saju는 null로 유지
+        }
+        var games = userGameService.getMyGames();
+        return new MyPageSummaryResponse(saju, games);
     }
 
     private MyPageSajuResponse buildResponse(SajuResponse saju) {
@@ -58,17 +76,12 @@ public class MyPageService {
 
         FiveElement dominant = findDominant(saju);
 
-        return new MyPageSajuResponse(
-                saju,
-                percentages,
-                dominant.name(),
-                ElementStyleMapper.describe(dominant)
-        );
+        return new MyPageSajuResponse(saju, percentages, dominant.name());
     }
 
     private double percent(double value, double total) {
         if (total == 0) return 0.0;
-        return Math.round((value / total) * 1000) / 10.0;  // 소수점 1자리
+        return Math.round((value / total) * 1000) / 10.0;
     }
 
     private FiveElement findDominant(SajuResponse saju) {

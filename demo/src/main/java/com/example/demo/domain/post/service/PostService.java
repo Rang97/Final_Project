@@ -80,7 +80,7 @@ public class PostService {
                 .postId(baseDetail.getPostId())
                 .title(baseDetail.getTitle())
                 .content(baseDetail.getContent())
-                .writerAnimalName(baseDetail.getWriterAnimalName())
+                .writerNickname(baseDetail.getWriterNickname())
                 .viewCount(baseDetail.getViewCount())
                 .createdAt(baseDetail.getCreatedAt())
                 .comments(comments)
