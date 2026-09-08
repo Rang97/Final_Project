@@ -7,6 +7,8 @@ import com.example.demo.domain.party.entity.PartyMember;
 import com.example.demo.domain.party.entity.PartyMemberStatus;
 import com.example.demo.domain.party.repository.PartyMemberMapper;
 import com.example.demo.domain.party.util.BadWordFilter;
+import com.example.demo.domain.saju.entity.Saju;
+import com.example.demo.domain.saju.repository.SajuMapper;
 import com.example.demo.global.jwt.AuthenticatedUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.MessagingException;
@@ -26,6 +28,7 @@ public class ChatController {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final PartyMemberMapper partyMemberMapper;
+    private final SajuMapper sajuMapper;
 
     @MessageMapping("/party/{partyId}/chat")
     public void sendChat(
@@ -42,6 +45,8 @@ public class ChatController {
             throw new MessagingException("파티원만 채팅에 참여할 수 있습니다.");
         }
 
+        Saju saju = sajuMapper.findByUserId(sender.userId()).orElseThrow();
+
         // null 방지
         if (request.content() == null || request.content().isBlank()) {
             throw new MessagingException("메시지 내용이 비어있습니다.");
@@ -54,7 +59,7 @@ public class ChatController {
 
         // 실제로 뿌릴 메시지 조립
         ChatMessageResponse response = new ChatMessageResponse(
-                sender.loginId(),
+                saju.getSajuAnimalName(),
                 request.content(),
                 ChatMessageType.CHAT,
                 LocalDateTime.now()
