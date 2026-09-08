@@ -77,9 +77,10 @@ class SajuCalculationServiceTest {
         assertThat(sajuCaptor.getValue().getYearStem()).isEqualTo("戊");
         assertThat(sajuCaptor.getValue().getDayBranch()).isEqualTo("酉");
         assertThat(sajuCaptor.getValue().getWoodCount()).isEqualTo(5.8);
-        assertThat(sajuCaptor.getValue().getSajuAnimalName()).isNull();
+        assertThat(sajuCaptor.getValue().getSajuAnimalName()).isEqualTo("붉은 닭");
         assertThat(response.userId()).isEqualTo(2L);
         assertThat(response.waterCount()).isEqualTo(1.0);
+        assertThat(response.sajuAnimalName()).isEqualTo("붉은 닭");
     }
 
     @Test

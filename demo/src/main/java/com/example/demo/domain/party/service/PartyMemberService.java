@@ -22,6 +22,7 @@ public class PartyMemberService {
     private final PartyMapper partyMapper;
     private final PartyMemberMapper partyMemberMapper;
     private final SajuMapper sajuMapper;
+    private final PartyChatNotifier partyChatNotifier;
 
 
     // 파티 참가
@@ -31,11 +32,21 @@ public class PartyMemberService {
         if (sajuMapper.findElementsByUserId(List.of(userId)).isEmpty()){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "사주 정보를 등록해야 파티에 가입할 수 있습니다.");
         }
+        Long activePartyId = partyMemberMapper.findActivePartyIdByUserId(userId);
+        if (activePartyId != null && !activePartyId.equals(partyId)){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 다른 파티에 참여 중입니다.");
+        }
         Party party = partyMapper.findById(partyId);
 
         if (party.getStatus() == PartyStatus.RECRUITING && party.getNowMemberCount() < party.getMaxMemberCount()) {
             PartyMember existing = partyMemberMapper.findByPartyIdAndUserId(partyId, userId);
+            if (existing != null && existing.getStatus() == PartyMemberStatus.APPROVED) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 가입된 파티입니다.");
+            }
             // 새로 가입한 경우 -> insert
+            if (existing != null && existing.getStatus() == PartyMemberStatus.APPROVED) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 가입된 파티입니다.");
+            }
             if (existing == null) {
                 PartyMember newMember = new PartyMember(partyId, userId, PartyMemberStatus.APPROVED);
                 partyMemberMapper.insertPartyMember(newMember);
@@ -52,6 +63,8 @@ public class PartyMemberService {
         } else {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "가입할 수 없는 파티입니다.");
         }
+        // 시스템 메시지 출력
+        partyChatNotifier.notifySystemMessage(partyId, userId, "입장했습니다.");
     }
 
     // 파티 떠나기
@@ -72,6 +85,8 @@ public class PartyMemberService {
         if (party.getStatus() == PartyStatus.FULL){
             partyMapper.updateStatus(partyId, PartyStatus.RECRUITING);
         }
+        // 시스템 메시지 출력
+        partyChatNotifier.notifySystemMessage(partyId, userId, "퇴장했습니다.");
     }
 
 }

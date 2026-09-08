@@ -93,7 +93,7 @@ CREATE TABLE `saju` (
     `metal_count` DOUBLE NOT NULL,
     `water_count` DOUBLE NOT NULL,
 
-    `saju_animal_name` VARCHAR(50) NULL,
+    `saju_animal_name` VARCHAR(50) NOT NULL,
     `calculated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
