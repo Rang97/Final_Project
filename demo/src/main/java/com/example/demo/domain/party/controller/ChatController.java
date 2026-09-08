@@ -6,6 +6,7 @@ import com.example.demo.domain.party.entity.ChatMessageType;
 import com.example.demo.domain.party.entity.PartyMember;
 import com.example.demo.domain.party.entity.PartyMemberStatus;
 import com.example.demo.domain.party.repository.PartyMemberMapper;
+import com.example.demo.domain.party.util.BadWordFilter;
 import com.example.demo.global.jwt.AuthenticatedUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.MessagingException;
@@ -39,6 +40,11 @@ public class ChatController {
         PartyMember partyMember = partyMemberMapper.findByPartyIdAndUserId(partyId, sender.userId());
         if (partyMember == null || partyMember.getStatus() != PartyMemberStatus.APPROVED){
             throw new MessagingException("파티원만 채팅에 참여할 수 있습니다.");
+        }
+
+        // 금칙어 예외
+        if (BadWordFilter.contains(request.content())) {
+            throw new MessagingException("금칙어가 포함되어 있어 전송할 수 없습니다.");
         }
 
         // 실제로 뿌릴 메시지 조립
