@@ -7,6 +7,8 @@ import com.example.demo.domain.user.dto.SignupRequest;
 import com.example.demo.domain.user.dto.SignupResponse;
 import com.example.demo.domain.user.entity.User;
 import com.example.demo.domain.user.repository.UserMapper;
+import com.example.demo.domain.saju.entity.SajuInput;
+import com.example.demo.domain.saju.repository.SajuInputMapper;
 import com.example.demo.common.exception.DuplicateLoginIdException;
 import com.example.demo.global.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class AuthService {
 
     private final UserMapper userMapper;
+    private final SajuInputMapper sajuInputMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
@@ -45,6 +48,16 @@ public class AuthService {
             userMapper.insert(user);
         } catch (DuplicateKeyException exception) {
             throw new DuplicateLoginIdException();
+        }
+
+        if (request.sajuInput() != null) {
+            sajuInputMapper.insert(SajuInput.from(
+                    user.getUserId(),
+                    request.sajuInput().birthDate(),
+                    request.sajuInput().gender(),
+                    request.sajuInput().calendarType(),
+                    request.sajuInput().birthTimeBranch()
+            ));
         }
 
         return SignupResponse.from(user);

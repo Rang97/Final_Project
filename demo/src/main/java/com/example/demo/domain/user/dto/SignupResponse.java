@@ -6,7 +6,9 @@ public record SignupResponse(
         Long userId,
         String loginId,
         String nickname,
-        String role
+        String role,
+        SajuRegistrationStatus sajuStatus,
+        String sajuMessage
 ) {
 
     public static SignupResponse from(User user) {
@@ -14,7 +16,13 @@ public record SignupResponse(
                 user.getUserId(),
                 user.getLoginId(),
                 user.getNickname(),
-                user.getRole()
+                user.getRole(),
+                SajuRegistrationStatus.NOT_PROVIDED,
+                "사주 정보가 입력되지 않았습니다."
         );
+    }
+
+    public SignupResponse withSajuStatus(SajuRegistrationStatus status, String message) {
+        return new SignupResponse(userId, loginId, nickname, role, status, message);
     }
 }

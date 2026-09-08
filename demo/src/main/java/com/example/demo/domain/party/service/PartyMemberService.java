@@ -44,6 +44,9 @@ public class PartyMemberService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 가입된 파티입니다.");
             }
             // 새로 가입한 경우 -> insert
+            if (existing != null && existing.getStatus() == PartyMemberStatus.APPROVED) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 가입된 파티입니다.");
+            }
             if (existing == null) {
                 PartyMember newMember = new PartyMember(partyId, userId, PartyMemberStatus.APPROVED);
                 partyMemberMapper.insertPartyMember(newMember);

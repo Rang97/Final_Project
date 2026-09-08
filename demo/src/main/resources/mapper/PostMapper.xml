@@ -6,9 +6,9 @@
         SELECT
         p.post_id    AS postId,
         p.title      AS title,
+        s.saju_animal_name AS writerAnimalName,
         p.view_count AS viewCount,
-        p.created_at AS createdAt,
-        s.saju_animal_name AS writerAnimalName
+        p.created_at AS createdAt
         FROM post p
         LEFT JOIN saju s ON p.writer_id = s.user_id
         <where>
