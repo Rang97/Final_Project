@@ -42,6 +42,11 @@ public class ChatController {
             throw new MessagingException("파티원만 채팅에 참여할 수 있습니다.");
         }
 
+        // null 방지
+        if (request.content() == null || request.content().isBlank()) {
+            throw new MessagingException("메시지 내용이 비어있습니다.");
+        }
+
         // 금칙어 예외
         if (BadWordFilter.contains(request.content())) {
             throw new MessagingException("금칙어가 포함되어 있어 전송할 수 없습니다.");
