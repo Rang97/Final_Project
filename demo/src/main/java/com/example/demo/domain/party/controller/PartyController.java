@@ -2,6 +2,7 @@ package com.example.demo.domain.party.controller;
 
 import com.example.demo.domain.party.dto.PartyCreateRequest;
 import com.example.demo.domain.party.dto.PartyListResponse;
+import com.example.demo.domain.party.dto.PartyUpdateRequest;
 import com.example.demo.domain.party.entity.ChemistryType;
 import com.example.demo.domain.party.entity.Party;
 import com.example.demo.domain.party.entity.PartySortBy;
@@ -83,6 +84,18 @@ public class PartyController {
     ){
         partyService.deletePartyMember(authenticatedUser.userId(), partyId, userId);
         return ResponseEntity.noContent().build();
+    }
+
+    // 파티 수정
+    @PatchMapping("/{partyId}")
+    @Operation(summary = "파티 수정", description = "파티장이 파티 제목과 궁합 유형을 수정합니다.")
+    public ResponseEntity<Party> updateParty(
+            @PathVariable Long partyId,
+            @RequestBody PartyUpdateRequest request,
+            @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser user){
+        Party party = partyService.updateParty(user.userId(), partyId, request);
+        return ResponseEntity.ok(party);
+
     }
 
     // 파티 가입

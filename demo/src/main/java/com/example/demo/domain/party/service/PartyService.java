@@ -2,6 +2,7 @@ package com.example.demo.domain.party.service;
 
 import com.example.demo.domain.party.dto.PartyCreateRequest;
 import com.example.demo.domain.party.dto.PartyListResponse;
+import com.example.demo.domain.party.dto.PartyUpdateRequest;
 import com.example.demo.domain.party.entity.*;
 import com.example.demo.domain.party.repository.PartyMapper;
 import com.example.demo.domain.party.repository.PartyMemberMapper;
@@ -109,6 +110,34 @@ public class PartyService {
 
         // 9. 시스템 메시지 출력
         partyChatNotifier.notifySystemMessage(partyId, targetUserId, "추방되었습니다.");
+    }
+
+    // 파티 수정
+    public Party updateParty(Long userId, Long partyId, PartyUpdateRequest request) {
+        Party party = partyMapper.findById(partyId);
+        if (party == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "파티를 찾을 수 없습니다.");
+        }
+
+        if (!party.getHostId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "방장만 수정할 수 있습니다.");
+        }
+
+        if (request.title() != null) {
+            party.setTitle(request.title());
+        }
+
+        if (request.chemistryType() != null) {
+            party.setChemistryType(request.chemistryType());
+        }
+
+        partyMapper.updateParty(party);
+
+        // 시스템 메시지 출력
+        partyChatNotifier.notifySystemMessage(partyId, userId, "파티 정보를 수정했습니다.");
+        return party;
+
+
     }
 
     //======================================================================
