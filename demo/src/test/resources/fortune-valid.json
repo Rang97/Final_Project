@@ -1,0 +1,30 @@
+{
+  "date": "2026-09-08",
+  "overallFortune": {
+    "score": 70,
+    "title": "집중의 날",
+    "content": "준비와 집중을 유지하세요."
+  },
+  "gameFortunes": [
+    {
+      "gameId": 15,
+      "score": 72,
+      "title": "함께 전진",
+      "content": "합류 타이밍을 확인하세요.",
+      "buff": {
+        "name": "집중",
+        "effect": "기본 역할을 차분히 수행하세요."
+      },
+      "caution": {
+        "name": "과속 주의",
+        "effect": "무리한 교전을 피하세요."
+      }
+    }
+  ],
+  "dailyQuest": {
+    "title": "준비 완료",
+    "mission": "시작 전 목표 하나를 정하세요.",
+    "reward": "가상 칭호: 차분한 모험가"
+  },
+  "oneLineMessage": "오늘은 차분하게 한 걸음."
+}
