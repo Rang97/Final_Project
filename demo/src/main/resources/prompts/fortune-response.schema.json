@@ -1,0 +1,127 @@
+{
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "overallFortune": {
+      "type": "object",
+      "properties": {
+        "score": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "title": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "score",
+        "title",
+        "content"
+      ],
+      "additionalProperties": false
+    },
+    "gameFortunes": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "properties": {
+          "gameId": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "score": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "buff": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "effect": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "effect"
+            ],
+            "additionalProperties": false
+          },
+          "caution": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "effect": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "effect"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "gameId",
+          "score",
+          "title",
+          "content",
+          "buff",
+          "caution"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "dailyQuest": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "mission": {
+          "type": "string"
+        },
+        "reward": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "mission",
+        "reward"
+      ],
+      "additionalProperties": false
+    },
+    "oneLineMessage": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "date",
+    "overallFortune",
+    "gameFortunes",
+    "dailyQuest",
+    "oneLineMessage"
+  ],
+  "additionalProperties": false
+}

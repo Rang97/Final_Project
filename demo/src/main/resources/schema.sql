@@ -29,6 +29,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 -- 자식 테이블부터 삭제
 DROP TABLE IF EXISTS `daily_fortune`;
+DROP TABLE IF EXISTS `fortune_generation`;
 DROP TABLE IF EXISTS `saju_input`;
 DROP TABLE IF EXISTS `block`;
 DROP TABLE IF EXISTS `comment`;
@@ -390,6 +391,7 @@ CREATE TABLE daily_fortune (
     user_id BIGINT NOT NULL,
     fortune_date DATE NOT NULL,
     game_fortune TEXT NULL,
+    response_json JSON NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (fortune_id),
@@ -404,6 +406,17 @@ CREATE TABLE daily_fortune (
 
 
 -- ============================================================
--- 스키마 생성 확인
+-- 13. FORTUNE_GENERATION: 사용자·날짜별 단일 생성 시도
 -- ============================================================
+CREATE TABLE IF NOT EXISTS fortune_generation (
+    user_id BIGINT NOT NULL,
+    fortune_date DATE NOT NULL,
+    status ENUM('PROCESSING', 'SUCCEEDED', 'FAILED') NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, fortune_date),
+    CONSTRAINT fk_fortune_generation_user FOREIGN KEY (user_id) REFERENCES `user`(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 스키마 생성 확인
 SHOW TABLES;
