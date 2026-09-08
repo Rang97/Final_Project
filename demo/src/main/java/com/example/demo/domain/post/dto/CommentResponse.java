@@ -5,13 +5,13 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-// domain/post/dto/CommentResponse.java
+// CommentResponse.java
 @Getter
 @Builder
 public class CommentResponse {
     private Long commentId;
     private Long postId;
-    private String writerAnimalName;
+    private String writerNickname; //유저 닉네임
     private String content;
     private LocalDateTime createdAt;
 }
