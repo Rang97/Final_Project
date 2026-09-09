@@ -11,12 +11,19 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* 로그인 */}
         <Route path="/login" element={<LoginPage />} />
         <Route element={<Layout />}>
+          {/* 메인 */}
           <Route path="/" element={<HomePage />} />
+          {/* 게시판 */}
           <Route path="/board" element={<BoardPage />} />
           <Route path="/board/:id" element={<BoardDetailPage />} />
+          {/* 파티 */}
           <Route path="/party" element={<PartyPage />} />
+          <Route path="/party/create" element={<PartyCreatePage />}></Route>
+          <Route path="/party/:partyId" element={<PartyDetailPage />}></Route>
+          {/* 마이페이지 */}
           <Route path="/mypage" element={<MyPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
