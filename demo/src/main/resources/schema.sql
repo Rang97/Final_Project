@@ -29,6 +29,8 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 -- 자식 테이블부터 삭제
 DROP TABLE IF EXISTS `daily_fortune`;
+DROP TABLE IF EXISTS `fortune_generation`;
+DROP TABLE IF EXISTS `saju_input`;
 DROP TABLE IF EXISTS `block`;
 DROP TABLE IF EXISTS `comment`;
 DROP TABLE IF EXISTS `post`;
@@ -109,6 +111,41 @@ CREATE TABLE `saju` (
     CONSTRAINT `chk_saju_earth_count` CHECK (`earth_count` >= 0),
     CONSTRAINT `chk_saju_metal_count` CHECK (`metal_count` >= 0),
     CONSTRAINT `chk_saju_water_count` CHECK (`water_count` >= 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ============================================================
+-- 2-1. SAJU_INPUT
+-- 회원가입에서 받은 원본 입력값. 계산 완료 후 SAJU 생성에 사용.
+-- USER : SAJU_INPUT = 1 : 1
+-- ============================================================
+CREATE TABLE `saju_input` (
+    `saju_input_id` BIGINT NOT NULL AUTO_INCREMENT,
+    `user_id` BIGINT NOT NULL,
+    `birth_date` DATE NOT NULL,
+    `gender` ENUM('MALE', 'FEMALE') NOT NULL,
+    `calendar_type` ENUM('SOLAR', 'LUNAR') NOT NULL,
+    `birth_time_type` ENUM('TIME_BRANCH', 'UNKNOWN') NOT NULL,
+    `birth_time_branch`
+        ENUM('JA', 'CHUK', 'IN', 'MYO', 'JIN', 'SA', 'O', 'MI', 'SIN', 'YU', 'SUL', 'HAE')
+        NULL,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (`saju_input_id`),
+    UNIQUE KEY `uk_saju_input_user_id` (`user_id`),
+
+    CONSTRAINT `fk_saju_input_user`
+        FOREIGN KEY (`user_id`)
+        REFERENCES `user` (`user_id`)
+        ON DELETE CASCADE,
+
+    CONSTRAINT `chk_saju_input_birth_time`
+        CHECK (
+            (`birth_time_type` = 'UNKNOWN' AND `birth_time_branch` IS NULL)
+            OR
+            (`birth_time_type` = 'TIME_BRANCH' AND `birth_time_branch` IS NOT NULL)
+        )
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -354,6 +391,7 @@ CREATE TABLE daily_fortune (
     user_id BIGINT NOT NULL,
     fortune_date DATE NOT NULL,
     game_fortune TEXT NULL,
+    response_json JSON NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (fortune_id),
@@ -368,6 +406,17 @@ CREATE TABLE daily_fortune (
 
 
 -- ============================================================
--- 스키마 생성 확인
+-- 13. FORTUNE_GENERATION: 사용자·날짜별 단일 생성 시도
 -- ============================================================
+CREATE TABLE IF NOT EXISTS fortune_generation (
+    user_id BIGINT NOT NULL,
+    fortune_date DATE NOT NULL,
+    status ENUM('PROCESSING', 'SUCCEEDED', 'FAILED') NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, fortune_date),
+    CONSTRAINT fk_fortune_generation_user FOREIGN KEY (user_id) REFERENCES `user`(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 스키마 생성 확인
 SHOW TABLES;

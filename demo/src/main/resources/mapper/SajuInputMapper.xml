@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.domain.saju.repository.SajuInputMapper">
+
+    <insert id="insert"
+            parameterType="com.example.demo.domain.saju.entity.SajuInput"
+            useGeneratedKeys="true"
+            keyProperty="sajuInputId">
+        INSERT INTO saju_input (
+            user_id,
+            birth_date,
+            gender,
+            calendar_type,
+            birth_time_type,
+            birth_time_branch
+        )
+        VALUES (
+            #{userId},
+            #{birthDate},
+            #{gender},
+            #{calendarType},
+            #{birthTimeType},
+            #{birthTimeBranch}
+        )
+    </insert>
+
+    <update id="updateByUserId"
+            parameterType="com.example.demo.domain.saju.entity.SajuInput">
+        UPDATE saju_input
+        SET birth_date = #{birthDate},
+            gender = #{gender},
+            calendar_type = #{calendarType},
+            birth_time_type = #{birthTimeType},
+            birth_time_branch = #{birthTimeBranch}
+        WHERE user_id = #{userId}
+    </update>
+
+    <select id="findByUserId"
+            resultType="com.example.demo.domain.saju.entity.SajuInput">
+        SELECT saju_input_id,
+               user_id,
+               birth_date,
+               gender,
+               calendar_type,
+               birth_time_type,
+               birth_time_branch
+        FROM saju_input
+        WHERE user_id = #{userId}
+    </select>
+
+</mapper>

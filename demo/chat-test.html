@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>파티 채팅 테스트</title>
+<script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+<style>
+  body { font-family: sans-serif; padding: 16px; background: #f4f4f4; }
+  h1 { font-size: 18px; }
+  .panels { display: flex; gap: 16px; flex-wrap: wrap; }
+  .panel { flex: 1; min-width: 360px; background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 12px; }
+  .panel h2 { margin-top: 0; font-size: 16px; }
+  .row { margin-bottom: 8px; display: flex; gap: 6px; align-items: center; }
+  .row input { flex: 1; padding: 4px; }
+  .row button { padding: 4px 10px; cursor: pointer; }
+  .status { font-size: 13px; color: #555; margin-bottom: 8px; }
+  .log { height: 240px; overflow-y: auto; background: #f9f9f9; border: 1px solid #ddd; padding: 6px; font-size: 13px; }
+  .log div { margin-bottom: 4px; }
+  .log .chat { color: #111; }
+  .log .system { color: #888; font-style: italic; }
+  .log .error { color: #c0392b; }
+  fieldset { border: 1px solid #ddd; border-radius: 6px; margin-bottom: 10px; }
+  legend { font-size: 12px; color: #777; padding: 0 4px; }
+</style>
+</head>
+<body>
+
+<h1>파티 채팅 테스트 (User A / User B 따로 로그인해서 테스트)</h1>
+<div class="row">
+  <label>서버 주소:</label>
+  <input id="baseUrl" value="http://localhost:8080" style="max-width:220px;">
+  <label>WS 주소:</label>
+  <input id="wsUrl" value="ws://localhost:8080/ws" style="max-width:220px;">
+</div>
+
+<div class="panels">
+  <div class="panel" id="panel-A"></div>
+  <div class="panel" id="panel-B"></div>
+</div>
+
+<script>
+const state = {
+  A: { token: null, userId: null, nickname: null, client: null },
+  B: { token: null, userId: null, nickname: null, client: null }
+};
+
+function baseUrl() { return document.getElementById('baseUrl').value.trim(); }
+function wsUrl() { return document.getElementById('wsUrl').value.trim(); }
+
+function renderPanel(id) {
+  const el = document.getElementById('panel-' + id);
+  el.innerHTML = `
+    <h2>User ${id}</h2>
+
+    <fieldset>
+      <legend>1. 로그인</legend>
+      <div class="row">
+        <input id="loginId-${id}" placeholder="아이디">
+        <input id="password-${id}" placeholder="비밀번호" type="password">
+        <button onclick="login('${id}')">로그인</button>
+      </div>
+      <div class="status" id="loginStatus-${id}">로그인 안 됨</div>
+    </fieldset>
+
+    <fieldset>
+      <legend>2. 소켓 연결 + 구독</legend>
+      <div class="row">
+        <input id="partyId-${id}" placeholder="파티 ID" style="max-width:100px;">
+        <button onclick="connect('${id}')">연결+구독</button>
+        <button onclick="disconnect('${id}')">연결 종료</button>
+      </div>
+      <div class="status" id="connStatus-${id}">연결 안 됨</div>
+    </fieldset>
+
+    <fieldset>
+      <legend>3. 채팅 보내기</legend>
+      <div class="row">
+        <input id="content-${id}" placeholder="메시지 내용">
+        <button onclick="sendChat('${id}')">전송</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>4. 가입 / 탈퇴 / 추방 (REST, 시스템 메시지 확인용)</legend>
+      <div class="row">
+        <button onclick="joinParty('${id}')">파티 가입</button>
+        <button onclick="leaveParty('${id}')">파티 탈퇴</button>
+      </div>
+      <div class="row">
+        <input id="kickTarget-${id}" placeholder="추방할 userId">
+        <button onclick="kickMember('${id}')">추방 (방장만 가능)</button>
+      </div>
+    </fieldset>
+
+    <div class="log" id="log-${id}"></div>
+  `;
+}
+renderPanel('A');
+renderPanel('B');
+
+function log(id, text, cls) {
+  const box = document.getElementById('log-' + id);
+  const line = document.createElement('div');
+  line.className = cls || '';
+  const time = new Date().toLocaleTimeString();
+  line.textContent = `[${time}] ${text}`;
+  box.appendChild(line);
+  box.scrollTop = box.scrollHeight;
+}
+
+async function login(id) {
+  const loginId = document.getElementById('loginId-' + id).value.trim();
+  const password = document.getElementById('password-' + id).value;
+  try {
+    const res = await fetch(baseUrl() + '/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ loginId, password })
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      document.getElementById('loginStatus-' + id).textContent = '로그인 실패: ' + res.status;
+      log(id, '로그인 실패: ' + err, 'error');
+      return;
+    }
+    const data = await res.json();
+    state[id].token = data.accessToken;
+    state[id].nickname = data.user.nickname;
+    document.getElementById('loginStatus-' + id).textContent =
+      `로그인 성공: ${data.user.nickname} (${loginId})`;
+    log(id, '로그인 성공: ' + data.user.nickname);
+  } catch (e) {
+    log(id, '로그인 요청 실패: ' + e, 'error');
+  }
+}
+
+function connect(id) {
+  if (!state[id].token) {
+    alert('먼저 로그인하세요');
+    return;
+  }
+  const partyId = document.getElementById('partyId-' + id).value.trim();
+  if (!partyId) {
+    alert('파티 ID를 입력하세요');
+    return;
+  }
+
+  const client = new StompJs.Client({
+    brokerURL: wsUrl(),
+    connectHeaders: { Authorization: 'Bearer ' + state[id].token },
+    reconnectDelay: 0,
+    onConnect: () => {
+      state[id].client = client;
+      document.getElementById('connStatus-' + id).textContent = '연결됨, 구독 시도중...';
+      log(id, 'CONNECT 성공');
+
+      client.subscribe('/sub/party/' + partyId, (message) => {
+        const body = JSON.parse(message.body);
+        const cls = body.type === 'SYSTEM' ? 'system' : 'chat';
+        log(id, `[${body.type}] ${body.sender}: ${body.content}`, cls);
+      });
+      document.getElementById('connStatus-' + id).textContent = '연결 + 구독 완료 (party ' + partyId + ')';
+      log(id, '/sub/party/' + partyId + ' 구독 완료');
+    },
+    onStompError: (frame) => {
+      document.getElementById('connStatus-' + id).textContent = 'STOMP 에러';
+      log(id, 'STOMP 에러: ' + frame.headers['message'], 'error');
+    },
+    onWebSocketError: (evt) => {
+      document.getElementById('connStatus-' + id).textContent = '웹소켓 에러';
+      log(id, '웹소켓 에러 (콘솔 확인)', 'error');
+    },
+    onDisconnect: () => {
+      document.getElementById('connStatus-' + id).textContent = '연결 종료됨';
+    }
+  });
+
+  client.activate();
+}
+
+function disconnect(id) {
+  if (state[id].client) {
+    state[id].client.deactivate();
+    log(id, '연결 종료 요청');
+  }
+}
+
+function sendChat(id) {
+  const partyId = document.getElementById('partyId-' + id).value.trim();
+  const content = document.getElementById('content-' + id).value;
+  if (!state[id].client || !state[id].client.connected) {
+    alert('먼저 연결하세요');
+    return;
+  }
+  state[id].client.publish({
+    destination: '/pub/party/' + partyId + '/chat',
+    body: JSON.stringify({ content })
+  });
+  document.getElementById('content-' + id).value = '';
+}
+
+async function restCall(id, path, method) {
+  if (!state[id].token) {
+    alert('먼저 로그인하세요');
+    return;
+  }
+  const partyId = document.getElementById('partyId-' + id).value.trim();
+  try {
+    const res = await fetch(baseUrl() + '/api/party/' + partyId + path, {
+      method,
+      headers: { Authorization: 'Bearer ' + state[id].token }
+    });
+    if (!res.ok) {
+      log(id, `${method} ${path} 실패: ${res.status}`, 'error');
+      return;
+    }
+    log(id, `${method} ${path} 성공`);
+  } catch (e) {
+    log(id, '요청 실패: ' + e, 'error');
+  }
+}
+
+function joinParty(id) { restCall(id, '/join', 'POST'); }
+function leaveParty(id) { restCall(id, '/leave', 'POST'); }
+function kickMember(id) {
+  const target = document.getElementById('kickTarget-' + id).value.trim();
+  restCall(id, '/kicked/' + target, 'DELETE');
+}
+</script>
+
+</body>
+</html>

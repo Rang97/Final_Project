@@ -1,0 +1,211 @@
+package com.example.demo.domain.party.service;
+
+import com.example.demo.domain.party.dto.PartyCreateRequest;
+import com.example.demo.domain.party.dto.PartyListResponse;
+import com.example.demo.domain.party.dto.PartyUpdateRequest;
+import com.example.demo.domain.party.entity.*;
+import com.example.demo.domain.party.repository.PartyMapper;
+import com.example.demo.domain.party.repository.PartyMemberMapper;
+import com.example.demo.domain.saju.dto.SajuElementDto;
+import com.example.demo.domain.saju.repository.SajuMapper;
+import com.example.demo.domain.saju.service.ChemistryService;
+import com.example.demo.domain.saju.util.FiveElement;
+import com.example.demo.domain.saju.util.FiveElementProfile;
+import com.example.demo.domain.saju.util.GroupElementSummary;
+import com.example.demo.global.jwt.AuthenticatedUser;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Comparator;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class PartyService {
+
+    private final PartyMapper partyMapper;
+    private final PartyMemberMapper partyMemberMapper;
+    private final SajuMapper sajuMapper;
+    private final ChemistryService chemistryService;
+    private final PartyChatNotifier partyChatNotifier;
+
+    // <방장>
+    // 파티 생성
+    @Transactional
+    public Party createParty(Long userId, PartyCreateRequest request) {
+        // 사주 정보 있어야 파티 가입 가능
+        if (sajuMapper.findElementsByUserId(List.of(userId)).isEmpty()){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "사주 정보를 등록해야 파티를 생성할 수 있습니다.");
+        }
+        if (partyMemberMapper.findActivePartyIdByUserId(userId) != null){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 참여 중인 파티가 있어 새 파티를 생성할 수 없습니다.");
+        }
+
+        // 파티 객체 조립
+        Party party = new Party(userId,
+                request.gameId(),
+                request.title(),
+                request.maxMemberCount(),
+                request.chemistryType());
+        partyMapper.insertParty(party);
+        // 파티 멤버 객체 조립
+        PartyMember partyMember = new PartyMember(
+                party.getPartyId(),
+                userId,
+                PartyMemberStatus.APPROVED
+        );
+        partyMemberMapper.insertPartyMember(partyMember);
+        return party;
+    }
+
+    // 파티 삭제
+    public void deleteParty(Long userId, Long partyId) {
+        Party party = partyMapper.findById(partyId);
+
+        // 방장 아닐 시 삭제 X
+        if (!party.getHostId().equals(userId)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "방장만 삭제할 수 있습니다.");
+        }
+
+        partyMapper.deleteParty(partyId);
+    }
+
+    // 파티원 추방
+    @Transactional
+    public void deletePartyMember(Long hostId, Long partyId, Long targetUserId) {
+        // 1. 방장 확인
+        Party party = partyMapper.findById(partyId);
+
+        // 2. 방장 권한 확인
+        if (!party.getHostId().equals(hostId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "방장은 추방될 수 없습니다.");
+        }
+
+        // 3. 자기 자신 추방 방지
+        if (targetUserId.equals(hostId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "자기 자신은 추방할 수 없습니다.");
+        }
+
+        // 4. 파티원 조회
+        PartyMember partyMember = partyMemberMapper.findByPartyIdAndUserId(partyId, targetUserId);
+
+        // 5. 없는 파티원 추방 시도 방지
+        if (partyMember == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 파티원을 찾을 수 없습니다.");
+        }
+
+        // 6. 파티 상태 업데이트
+        partyMemberMapper.updatePartyStatus(partyMember.getPartyMemberId(), PartyMemberStatus.KICKED);
+
+        // 7. 파티 인원 업데이트
+        partyMapper.updateMemberCount(partyId, party.getNowMemberCount() - 1);
+
+        // 8. 파티 상태 변경 (정원 도달한 후)
+        if (party.getStatus() == PartyStatus.FULL){
+            partyMapper.updateStatus(partyId, PartyStatus.RECRUITING);
+        }
+
+        // 9. 시스템 메시지 출력
+        partyChatNotifier.notifySystemMessage(partyId, targetUserId, "추방되었습니다.");
+    }
+
+    // 파티 수정
+    public Party updateParty(Long userId, Long partyId, PartyUpdateRequest request) {
+        Party party = partyMapper.findById(partyId);
+        if (party == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "파티를 찾을 수 없습니다.");
+        }
+
+        if (!party.getHostId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "방장만 수정할 수 있습니다.");
+        }
+
+        if (request.title() != null) {
+            party.setTitle(request.title());
+        }
+
+        if (request.chemistryType() != null) {
+            party.setChemistryType(request.chemistryType());
+        }
+
+        partyMapper.updateParty(party);
+
+        // 시스템 메시지 출력
+        partyChatNotifier.notifySystemMessage(partyId, userId, "파티 정보를 수정했습니다.");
+        return party;
+
+
+    }
+
+    //======================================================================
+
+    // 파티 단건 조회
+    public Party getParty(Long partyId) {
+        Party party = partyMapper.findById(partyId);
+        if (party == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "파티를 찾을 수 없습니다.");
+        }
+        return party;
+    }
+
+    // 파티 목록 조회 (정렬 포함)
+    public List<PartyListResponse> getPartyList(PartySortBy sortBy, boolean ascending, AuthenticatedUser user, Long gameId) {
+        PartySortBy resolvedSortBy = sortBy;
+
+        // 정렬 기준이 사주 궁합인 경우
+        if (sortBy == PartySortBy.CHEMISTRY_MATCH) {
+            resolvedSortBy = resolvedSortBy(user.userId());
+        }
+
+        List<PartyListResponse> parties = partyMapper.findPartyList(resolvedSortBy, ascending, gameId);
+
+        // 오행 기준 정렬
+        if (resolvedSortBy != null && resolvedSortBy.isElement()){
+            FiveElement element = FiveElement.valueOf(resolvedSortBy.name());
+            Comparator<PartyListResponse> comparator = Comparator.comparingDouble(p -> getElementScore(p.getPartyId(), element));
+            parties.sort(ascending ? comparator : comparator.reversed());
+        }
+        return parties;
+    }
+
+    private PartySortBy resolvedSortBy(Long userId) {
+        List<FiveElementProfile> profiles = sajuMapper.findElementsByUserId(List.of(userId)).stream()
+                                                      .map(SajuElementDto::toProfile)
+                                                      .toList();
+        GroupElementSummary summary = chemistryService.summarizeGroup(profiles);
+        FiveElement weakest = summary.minElements().get(0);
+        return switch (weakest) {
+            case WOOD -> PartySortBy.WOOD;
+            case FIRE -> PartySortBy.FIRE;
+            case EARTH -> PartySortBy.EARTH;
+            case METAL -> PartySortBy.METAL;
+            case WATER -> PartySortBy.WATER;
+        };
+    }
+
+    // 파티 하나의 특정 오행 합산 점수 계산
+    private double getElementScore(Long partyId, FiveElement element) {
+        List<Long> memberIds = partyMemberMapper.findApprovedMemberIds(partyId);
+        if (memberIds.isEmpty()) {
+            return 0;
+        }
+
+        List<FiveElementProfile> profiles = sajuMapper.findElementsByUserId(memberIds).stream()
+                .map(SajuElementDto::toProfile)
+                .toList();
+        GroupElementSummary summary = chemistryService.summarizeGroup(profiles);
+
+        return switch (element){
+            case WOOD -> summary.totalWood();
+            case FIRE -> summary.totalFire();
+            case EARTH -> summary.totalEarth();
+            case METAL -> summary.totalMetal();
+            case WATER -> summary.totalWater();
+        };
+    }
+
+
+}

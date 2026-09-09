@@ -1,0 +1,92 @@
+package com.example.demo.domain.party.service;
+
+import com.example.demo.domain.party.entity.Party;
+import com.example.demo.domain.party.entity.PartyMember;
+import com.example.demo.domain.party.entity.PartyMemberStatus;
+import com.example.demo.domain.party.entity.PartyStatus;
+import com.example.demo.domain.party.repository.PartyMapper;
+import com.example.demo.domain.party.repository.PartyMemberMapper;
+import com.example.demo.domain.saju.repository.SajuMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class PartyMemberService {
+
+    private final PartyMapper partyMapper;
+    private final PartyMemberMapper partyMemberMapper;
+    private final SajuMapper sajuMapper;
+    private final PartyChatNotifier partyChatNotifier;
+
+
+    // 파티 참가
+    @Transactional
+    public void joinParty(Long partyId, Long userId) {
+        // 사주 정보 있어야 파티 가입 가능
+        if (sajuMapper.findElementsByUserId(List.of(userId)).isEmpty()){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "사주 정보를 등록해야 파티에 가입할 수 있습니다.");
+        }
+        Long activePartyId = partyMemberMapper.findActivePartyIdByUserId(userId);
+        if (activePartyId != null && !activePartyId.equals(partyId)){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 다른 파티에 참여 중입니다.");
+        }
+        Party party = partyMapper.findById(partyId);
+
+        if (party.getStatus() == PartyStatus.RECRUITING && party.getNowMemberCount() < party.getMaxMemberCount()) {
+            PartyMember existing = partyMemberMapper.findByPartyIdAndUserId(partyId, userId);
+            if (existing != null && existing.getStatus() == PartyMemberStatus.APPROVED) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 가입된 파티입니다.");
+            }
+            // 새로 가입한 경우 -> insert
+            if (existing != null && existing.getStatus() == PartyMemberStatus.APPROVED) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 가입된 파티입니다.");
+            }
+            if (existing == null) {
+                PartyMember newMember = new PartyMember(partyId, userId, PartyMemberStatus.APPROVED);
+                partyMemberMapper.insertPartyMember(newMember);
+            // 추방 당했다가 가입한 경우 -> updateStatus
+            } else {
+                partyMemberMapper.updatePartyStatus(existing.getPartyMemberId(), PartyMemberStatus.APPROVED);
+            }
+            partyMapper.updateMemberCount(partyId, party.getNowMemberCount() + 1);
+
+            // 정원 도달 시 파티 상태 FULL 변경
+            if (party.getNowMemberCount() + 1 == party.getMaxMemberCount()){
+                partyMapper.updateStatus(partyId, PartyStatus.FULL);
+            }
+        } else {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "가입할 수 없는 파티입니다.");
+        }
+        // 시스템 메시지 출력
+        partyChatNotifier.notifySystemMessage(partyId, userId, "입장했습니다.");
+    }
+
+    // 파티 떠나기
+    @Transactional
+    public void leaveParty(Long partyId, Long userId) {
+        Party party = partyMapper.findById(partyId);
+        if (party.getHostId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "방장은 파티를 떠날 수 없습니다, 삭제를 이용하세요.");
+        }
+        PartyMember partyMember = partyMemberMapper.findByPartyIdAndUserId(partyId, userId);
+        if (partyMember == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "파티원이 아닙니다.");
+        }
+        partyMemberMapper.updatePartyStatus(partyMember.getPartyMemberId(), PartyMemberStatus.LEFT);
+        partyMapper.updateMemberCount(partyId, party.getNowMemberCount() - 1);
+
+        // 정원 도달 후 파티 상태 RECRUITING 변경
+        if (party.getStatus() == PartyStatus.FULL){
+            partyMapper.updateStatus(partyId, PartyStatus.RECRUITING);
+        }
+        // 시스템 메시지 출력
+        partyChatNotifier.notifySystemMessage(partyId, userId, "퇴장했습니다.");
+    }
+
+}
