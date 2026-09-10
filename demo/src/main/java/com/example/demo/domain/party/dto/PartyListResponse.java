@@ -26,4 +26,5 @@ public class PartyListResponse {
     ChemistryType chemistryType;
     PartyStatus status;
     LocalDateTime createdAt;
+    boolean joined;
 }

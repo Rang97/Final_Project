@@ -7,8 +7,12 @@ import com.example.demo.domain.party.entity.ChemistryType;
 import com.example.demo.domain.party.entity.Party;
 import com.example.demo.domain.party.entity.PartySortBy;
 import com.example.demo.domain.party.entity.PartyStatus;
+import com.example.demo.domain.party.repository.PartyMemberMapper;
 import com.example.demo.domain.party.service.PartyMemberService;
 import com.example.demo.domain.party.service.PartyService;
+import com.example.demo.domain.saju.repository.SajuMapper;
+import com.example.demo.domain.saju.service.ChemistryService;
+import com.example.demo.domain.saju.util.GroupElementSummary;
 import com.example.demo.global.jwt.AuthenticatedUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,6 +39,9 @@ public class PartyController {
 
     private final PartyService partyService;
     private final PartyMemberService partyMemberService;
+    private final PartyMemberMapper partyMemberMapper;
+    private final SajuMapper sajuMapper;
+    private final ChemistryService chemistryService;
 
     // 파티 생성
     @PostMapping("/create")
@@ -159,6 +166,16 @@ public class PartyController {
         return ResponseEntity.ok(parties);
     }
 
+    // 파티원 오행 현황 조회
+    @GetMapping("/{partyId}/chemistry")
+    @Operation(summary = "파티 오행 현황 조회", description = "파티원 전체의 오행 합계와 부족한 오행을 반환합니다.")
+    public ResponseEntity<GroupElementSummary> getPartyChemistry(
+            @Parameter(description = "파티 ID", example = "1")
+            @PathVariable Long partyId
+    ){
+GroupElementSummary summary = partyService.getPartyChemistry(partyId);
+        return ResponseEntity.ok(summary);
+    }
 
 
 
