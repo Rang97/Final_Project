@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.demo.domain.post.repository.CommentMapper">
-    <select id="findVisibleCommentsByPostId" resultType="com.example.demo.domain.post.dto.CommentResponse">
-        SELECT
+    <select id="findVisibleCommentsByPostId" resultType="com.example.demo.domain.post.dto.CommentResponse">        SELECT
         c.comment_id AS commentId,
         c.post_id    AS postId,
         c.content    AS content,
         c.created_at AS createdAt,
-        u.nickname   AS writerNickname
+        s.saju_animal_name AS writerAnimalName
         FROM comment c
-        JOIN user u ON c.writer_id = u.user_id
+        LEFT JOIN saju s ON c.writer_id = s.user_id
         <where>
             c.post_id = #{postId}
             <if test="blockerId != null">
