@@ -1,7 +1,8 @@
 import axios from "axios";
-import { useAuthStore } from "../stores/authStore";
+import { useAuthStore } from "../store/authStore";
 
-//axios 로 apiClient 객체를 생성(기본주소:백엔드 http://localhost:8080/api)
+//axios 로 apiClient 객체를 생성
+// (기본주소:백엔드 http://localhost:8080/api)
 const apiClient = axios.create({
   baseURL: "http://localhost:8080/api",
   timeout: 5000,
@@ -16,7 +17,6 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     const accessToken = useAuthStore.getState().accessToken;
-
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
