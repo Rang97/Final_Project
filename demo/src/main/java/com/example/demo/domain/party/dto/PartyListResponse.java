@@ -17,6 +17,7 @@ public class PartyListResponse {
     Long hostId;
     String title;
     String coverUrl;
+    String hostNickname;
     Long gameId;
     String gameName;
     String genre;

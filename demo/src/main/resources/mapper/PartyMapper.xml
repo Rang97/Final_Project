@@ -12,9 +12,14 @@
 
     <!--  파티 목록 조회 (정렬 포함)  -->
     <select id="findPartyList" resultType="PartyListResponse">
-        SELECT p.*, g.name_ko AS gameName, g.genre AS genre
+        SELECT
+        p.party_id, p.host_id, p.title, p.game_id,
+        p.max_member_count, p.now_member_count, p.chemistry_type, p.status, p.created_at,
+        g.name_ko AS gameName, g.genre AS genre, g.cover_url AS coverUrl,
+        s.saju_animal_name AS hostNickname
         FROM party p
-        JOIN game g ON p.game_id = g.game_id
+        LEFT JOIN game g ON p.game_id = g.game_id
+        LEFT JOIN saju s ON s.user_id = p.host_id
         <where>
             <if test="gameId != null">p.game_id = #{gameId}</if>
         </where>
