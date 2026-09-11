@@ -1,1 +1,32 @@
+@import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap");
 @import "tailwindcss";
+
+html,
+body,
+#root {
+  height: 100%;
+  background: #07070e;
+  color: #f0f0fa;
+  font-family: "Inter", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.35);
+  border-radius: 99px;
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(124, 58, 237, 0.35) transparent;
+}
