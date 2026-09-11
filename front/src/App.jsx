@@ -14,6 +14,7 @@ export default function App() {
       <AuthGate>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<LoginPage />} />
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/board" element={<BoardPage />} />

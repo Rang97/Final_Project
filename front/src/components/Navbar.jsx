@@ -85,7 +85,7 @@ export default function Navbar() {
             background: "linear-gradient(135deg, #7c3aed, #5b21b6)",
             color: "#fff",
           }}
-          onClick={user ? logout : () => navigate("/login?mode=register")}
+          onClick={user ? logout : () => navigate("/signup")}
         >
           {user ? "로그아웃" : "회원가입"}
         </button>
@@ -160,7 +160,7 @@ export default function Navbar() {
               onClick={() => {
                 setMenuOpen(false);
                 if (user) logout();
-                else navigate("/login?mode=register");
+                else navigate("/signup");
               }}
             >
               {user ? "로그아웃" : "회원가입"}

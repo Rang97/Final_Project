@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigate, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { login, signup } from "../features/auth/authApi";
 import { authErrorMessage } from "../api/client";
 import { useAuthStore } from "../store/authStore";
@@ -17,8 +17,8 @@ const birthTimes = [
 const emptySaju = { birthDate: "", gender: "", calendarType: "SOLAR", birthTimeBranch: "UNKNOWN" };
 
 export default function LoginPage() {
-  const [params, setParams] = useSearchParams();
-  const register = params.get("mode") === "register";
+  const location = useLocation();
+  const register = location.pathname === "/signup";
   const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
   const [nickname, setNickname] = useState("");
@@ -35,11 +35,10 @@ export default function LoginPage() {
   const user = useAuthStore((state) => state.user);
   const notice = useAuthStore((state) => state.notice);
   const navigate = useNavigate();
-  const location = useLocation();
   const destination = location.state?.from === "/mypage" ? "/mypage" : "/";
 
   function changeMode(nextRegister) {
-    setParams(nextRegister ? { mode: "register" } : {}, { replace: true, state: location.state });
+    navigate(nextRegister ? "/signup" : "/login", { replace: true, state: location.state });
     setError("");
     setMessage("");
     setPassword("");
