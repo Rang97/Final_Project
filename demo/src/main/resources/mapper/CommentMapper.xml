@@ -5,9 +5,9 @@
         SELECT
         c.comment_id AS commentId,
         c.post_id    AS postId,
+        u.nickname   AS writerNickname,
         c.content    AS content,
-        c.created_at AS createdAt,
-        u.nickname   AS writerNickname
+        c.created_at AS createdAt
         FROM comment c
         JOIN user u ON c.writer_id = u.user_id
         <where>
