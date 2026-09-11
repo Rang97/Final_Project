@@ -7,6 +7,7 @@ import MyPage from "./pages/MyPage";
 import LoginPage from "./pages/LoginPage";
 import Layout from "./components/Layout";
 import BoardWritePage from "./pages/BoardWritePage";
+import BoardEditPage from "./pages/BoardEditPage";
 
 export default function App() {
   return (
@@ -16,10 +17,11 @@ export default function App() {
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/board" element={<BoardPage />} />
+          <Route path="/board/write" element={<BoardWritePage />} />
           <Route path="/board/:id" element={<BoardDetailPage />} />
+          <Route path="/board/:id/edit" element={<BoardEditPage />} />
           <Route path="/party" element={<PartyPage />} />
           <Route path="/mypage" element={<MyPage />} />
-          <Route path="/board/write" element={<BoardWritePage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

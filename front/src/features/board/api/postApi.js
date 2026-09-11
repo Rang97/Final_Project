@@ -10,15 +10,18 @@ export const getPost = async (postId) => {
   return response.data.data;
 };
 
+// POST /api/posts -> ApiResponse<Long> (생성된 postId 숫자를 그대로 반환)
 export const createPost = async ({ title, content }) => {
   const response = await apiClient.post("/posts", { title, content });
   return response.data.data;
 };
 
-export const updatePost = (postId, body) => {
-  throw new Error("Not implemented yet");
+// PUT /api/posts/{postId} -> ApiResponse<Void>
+export const updatePost = async (postId, { title, content }) => {
+  await apiClient.put(`/posts/${postId}`, { title, content });
 };
 
-export const deletePost = (postId) => {
-  throw new Error("Not implemented yet");
+// DELETE /api/posts/{postId} -> ApiResponse<Void>
+export const deletePost = async (postId) => {
+  await apiClient.delete(`/posts/${postId}`);
 };

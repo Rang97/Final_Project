@@ -5,6 +5,7 @@ export const getComments = async (postId) => {
   return response.data.data;
 };
 
+// POST -> ApiResponse<Long> (생성된 commentId)
 export const createComment = async (postId, { content }) => {
   const response = await apiClient.post(`/posts/${postId}/comments`, {
     content,
@@ -12,10 +13,10 @@ export const createComment = async (postId, { content }) => {
   return response.data.data;
 };
 
-export const updateComment = (postId, commentId, body) => {
-  throw new Error("Not implemented yet");
+export const updateComment = async (postId, commentId, { content }) => {
+  await apiClient.put(`/posts/${postId}/comments/${commentId}`, { content });
 };
 
-export const deleteComment = (postId, commentId) => {
-  throw new Error("Not implemented yet");
+export const deleteComment = async (postId, commentId) => {
+  await apiClient.delete(`/posts/${postId}/comments/${commentId}`);
 };
