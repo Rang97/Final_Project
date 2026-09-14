@@ -9,6 +9,7 @@ import { api } from "../api/client";
 import { useNavigate } from "react-router-dom";
 import { BiSolidUpArrow } from "react-icons/bi";
 import ErrorToast from "../components/ErrorToast";
+import PartyChatModal from "../components/PartyChatModal";
 
 // 정렬 라벨: 백엔드 PartySortBy enum 매핑
 
@@ -107,6 +108,7 @@ export default function PartyPage() {
   const [ascending, setAscending] = useState(true);
   const [joined, setJoined] = useState([]);
   const [error, setError] = useState(null);
+  const [activeChatParty, setActiveChatParty] = useState(null);
 
   // 드롭다운 선택 -> sortBy 갱신
   const handleSortChange = (value) => {
@@ -127,10 +129,11 @@ export default function PartyPage() {
       .finally(() => setLoading(false));
   }, [sortBy, ascending]);
 
-  const handleJoin = async (id) => {
+  const handleJoin = async (party) => {
     try {
-      await api.post(`/party/${id}/join`);
-      setJoined((prev) => [...prev, id]);
+      await api.post(`/party/${party.partyId}/join`);
+      setJoined((prev) => [...prev, party.partyId]);
+      setActiveChatParty(party);
       setError(null);
     } catch (err) {
       setError(err.response?.data?.message ?? "참가에 실패했습니다.");
@@ -149,10 +152,10 @@ export default function PartyPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-6 md:px-10 py-12">
+    <div className="max-w-6xl mx-auto px-6 md:px-10 py-12 ">
       {/* 헤더 */}
-      <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
-        <div>
+      <div className="flex mb-10 flex-wrap gap-4">
+        <div className="justify-content-center">
           <p
             className="text-xs uppercase tracking-widest mb-2"
             style={{ color: "#5690CC" }}
@@ -166,12 +169,6 @@ export default function PartyPage() {
             파티 모집
           </h1>
         </div>
-        <button
-          className="brand-gradient-btn px-5 py-2 rounded-4xl text-sm font-semibold text-white"
-          onClick={() => navigate("/party/create")}
-        >
-          파티 생성
-        </button>
       </div>
 
       {/* 정렬 */}
@@ -219,6 +216,12 @@ export default function PartyPage() {
               <BiSolidUpArrow size={16} />
             </span>
           </button>
+          <button
+            className="brand-gradient-btn px-5 py-2 rounded-xl text-sm font-semibold text-white ml-35"
+            onClick={() => navigate("/party/create")}
+          >
+            파티 생성
+          </button>
         </div>
       </div>
 
@@ -228,7 +231,7 @@ export default function PartyPage() {
       {/* 파티 카드 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {parties.map((party) => {
-          const isJoined = joined.includes(party.partyId);
+          const isJoined = party.joined || joined.includes(party.partyId);
           const isFull = party.status === "FULL";
 
           return (
@@ -353,9 +356,11 @@ export default function PartyPage() {
 
                 {/* 참가 버튼 */}
                 <button
-                  onClick={() => !isJoined && handleJoin(party.partyId)}
+                  onClick={() =>
+                    isJoined ? setActiveChatParty(party) : handleJoin(party)
+                  }
                   disabled={isFull && !isJoined}
-                  className={`w-full py-2.5 rounded-4xl text-sm font-semibold transition-all ${
+                  className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${
                     !isJoined && !isFull ? "brand-gradient-btn text-white" : ""
                   }`}
                   style={
@@ -374,13 +379,20 @@ export default function PartyPage() {
                         : undefined
                   }
                 >
-                  {isJoined ? "✓ 참가 완료" : isFull ? "마감" : "참가 신청"}
+                  {isJoined ? "✓ 채팅" : isFull ? "마감" : "참가 신청"}
                 </button>
               </div>
             </div>
           );
         })}
       </div>
+
+      {activeChatParty && (
+        <PartyChatModal
+          party={activeChatParty}
+          onClose={() => setActiveChatParty(null)}
+        />
+      )}
     </div>
   );
 }
