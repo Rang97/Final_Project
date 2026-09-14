@@ -69,7 +69,7 @@ public class PartyService {
         Party party = partyMapper.findById(partyId);
 
         if (party == null){
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT, "삭제되었거나 존재하지 않는 파티입니다.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "삭제되었거나 존재하지 않는 파티입니다.");
         }
 
         // 방장 아닐 시 삭제 X
