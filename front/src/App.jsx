@@ -6,6 +6,7 @@ import PartyPage from "./pages/PartyPage";
 import MyPage from "./pages/MyPage";
 import LoginPage from "./pages/LoginPage";
 import Layout from "./components/Layout";
+import PartyCreatePage from "./pages/PartyCreatePage";
 
 export default function App() {
   return (
@@ -22,7 +23,6 @@ export default function App() {
           {/* 파티 */}
           <Route path="/party" element={<PartyPage />} />
           <Route path="/party/create" element={<PartyCreatePage />}></Route>
-          <Route path="/party/:partyId" element={<PartyDetailPage />}></Route>
           {/* 마이페이지 */}
           <Route path="/mypage" element={<MyPage />} />
         </Route>
