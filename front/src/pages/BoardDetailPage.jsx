@@ -27,6 +27,8 @@ export default function BoardDetailPage() {
     error: commentError,
   } = useCommentSubmit(postId, () => refetch());
 
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editContent, setEditContent] = useState("");
   const { editComment, isSubmitting: isEditingSubmit } = useCommentEdit(
     postId,
     () => {
@@ -34,8 +36,6 @@ export default function BoardDetailPage() {
       refetch();
     },
   );
-  const [editingCommentId, setEditingCommentId] = useState(null);
-  const [editContent, setEditContent] = useState("");
 
   const { removeComment } = useCommentDelete(postId, () => refetch());
 

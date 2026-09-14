@@ -1,3 +1,5 @@
+// 서버-프론트 오행 데이터 주고받을 때 쓰는 매핑 테이블
+
 // 오행 한글 라벨
 export const ELEMENT_LABELS = {
   WOOD: "목",

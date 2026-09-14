@@ -1,5 +1,7 @@
 import { ELEMENT_COLORS, ELEMENT_TOTAL_KEYS } from "../constants/fiveElements";
 
+// 오행 비율 도넛 차트
+
 // 도넛 그래프 크기/두께 설정
 const SIZE = 100;
 const CENTER = SIZE / 2;
