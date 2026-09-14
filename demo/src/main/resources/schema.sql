@@ -157,6 +157,7 @@ CREATE TABLE `game` (
     `name_ko` VARCHAR(100) NOT NULL,
     `cover_url` VARCHAR(500) NULL,
     `genre` VARCHAR(100) NULL,
+    `description` VARCHAR(255) NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (`game_id`),

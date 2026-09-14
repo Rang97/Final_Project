@@ -53,6 +53,7 @@
         name_ko AS name,
         cover_url AS coverUrl,
         genre AS genre,
+        description AS description,
         FALSE AS isMain
         FROM game
         ORDER BY name_ko
