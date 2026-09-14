@@ -14,22 +14,31 @@ export function useMyGames() {
   const [error, setError] = useState(null);
   const [isMutating, setIsMutating] = useState(false);
 
-  const fetchGames = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
+  const fetchGames = useCallback(async (background = false) => {
+    if (!background) setIsLoading(true);
+    if (!background) setError(null);
     try {
       const data = await getMyGames();
       setGames(data);
     } catch (err) {
+      if (background) throw err;
       setError(err);
     } finally {
-      setIsLoading(false);
+      if (!background) setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchGames();
-  }, [fetchGames]);
+    let active = true;
+    getMyGames().then((data) => {
+      if (active) setGames(data);
+    }).catch((err) => {
+      if (active) setError(err);
+    }).finally(() => {
+      if (active) setIsLoading(false);
+    });
+    return () => { active = false; };
+  }, []);
 
   const isMaxed = games.length >= MAX_GAMES;
 
@@ -38,9 +47,11 @@ export function useMyGames() {
     setIsMutating(true);
     try {
       await registerGame(gameId);
-      await fetchGames();
-    } catch (err) {
-      throw err;
+      try {
+        await fetchGames(true);
+      } catch {
+        throw new Error("게임은 등록되었지만 목록을 갱신하지 못했습니다. 페이지를 새로고침해주세요.");
+      }
     } finally {
       setIsMutating(false);
     }
