@@ -8,5 +8,6 @@ public record UserGameResponse(
         @Schema(description = "게임 이름", example = "리그 오브 레전드") String name,
         @Schema(description = "게임 이미지 URL", example = "https://example.com/game-cover.png", nullable = true) String coverUrl,
         @Schema(description = "게임 장르", example = "MOBA", nullable = true) String genre,
+        @Schema(description = "게임 설명", example = "5v5 팀 전투 MOBA 게임", nullable = true) String description,
         @Schema(description = "대표 게임 여부", example = "true") boolean isMain) {
 }
