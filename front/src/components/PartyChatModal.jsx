@@ -11,8 +11,10 @@ import {
 } from "../constants/fiveElements";
 import ErrorToast from "./ErrorToast";
 
+
+
 export default function PartyChatModal({ party, onClose, onLeave, onDelete }) {
-  const token = useAuthStore((state) => state.token); // 토큰
+  const token = useAuthStore((state) => state.token);
   const [messages, setMessages] = useState([]); // 메시지 배열
   const [input, setInput] = useState(""); // 입력창 값
   const [myAnimalName, setMyAnimalName] = useState(null); // 사주 닉
