@@ -9,7 +9,6 @@ import Layout from "./components/Layout";
 import PartyCreatePage from "./pages/PartyCreatePage";
 import BoardWritePage from "./pages/BoardWritePage";
 import BoardEditPage from "./pages/BoardEditPage";
-import Layout from "./components/Layout";
 import AuthGate, { RequireAuth } from "./features/auth/AuthGate";
 
 export default function App() {
@@ -26,8 +25,8 @@ export default function App() {
           <Route path="/board/:id/edit" element={<RequireAuth><BoardEditPage /></RequireAuth>} />
           <Route path="/board/:id" element={<BoardDetailPage />} />
           <Route path="/party" element={<PartyPage />} />
-          <Route path="/party/create" element={<PartyCreatePage />}></Route>
-          <Route path="/mypage" element={<MyPage />} />
+          <Route path="/party/create" element={<RequireAuth><PartyCreatePage /></RequireAuth>} />
+          <Route path="/mypage" element={<RequireAuth><MyPage /></RequireAuth>} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

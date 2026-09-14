@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuthStore } from "../store/authStore";
+import GameSection from "../features/mypage/components/GameSection";
 import {
   blankInput,
   calculate,
@@ -211,6 +212,8 @@ export default function MyPage() {
           </button>
         </div>
       )}
+
+      <GameSection />
 
       <section className={panel} aria-labelledby="elements-title">
         <h2 id="elements-title" className="text-xl font-semibold mb-5">

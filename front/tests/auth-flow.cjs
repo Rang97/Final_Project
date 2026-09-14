@@ -31,6 +31,10 @@ const assert = require('node:assert/strict');
       body = status === 200 ? {userId:1,loginId:'tester_123',nickname:'테스트유저',role:'USER'} : {};
     } else if (path === '/api/auth/birth-time-options') body = [{value:'UNKNOWN',label:'모름'}];
     else if (path === '/api/mypage/summary') body = {data:{saju:null,games:[]}};
+    else if (path === '/api/users/me/games') {
+      assert.equal(request.headers().authorization, 'Bearer test-token');
+      body = {data:[]};
+    }
     else if (path === '/api/blocks') body = {data:[]};
     else if (path === '/api/saju/input') { status = 404; body = {}; }
     else throw new Error(path);

@@ -18,6 +18,7 @@ Playwright와 Microsoft Edge가 있는 환경에서 개발 서버를 실행한 �
 node tests/auth-flow.cjs
 node tests/mypage-flow.cjs
 node tests/board-flow.cjs
+node tests/party-create-flow.cjs
 ```
 
 Playwright가 프로젝트 외부에 설치되어 있다면 `PLAYWRIGHT_MODULE`을 해당 모듈 경로로 설정합니다.
@@ -31,3 +32,4 @@ Playwright가 프로젝트 외부에 설치되어 있다면 `PLAYWRIGHT_MODULE`�
 게시판 테스트는 비로그인 조회, 글쓰기 접근 보호와 로그인 후 복귀,
 공통 인증 토큰을 통한 게시글·댓글 작성/수정/삭제, 게시판 API의 401 응답 시 세션 만료를 검증합니다.
 게시판과 마이페이지 API는 동일한 `/api` 클라이언트와 sessionStorage 인증 정보를 사용합니다.
+파티 생성 테스트는 로그인 보호, 공통 토큰 전송, 첫 선호 게임의 기본 선택과 생성 요청 데이터, 게임이 없을 때 제출 비활성화를 검증합니다.
