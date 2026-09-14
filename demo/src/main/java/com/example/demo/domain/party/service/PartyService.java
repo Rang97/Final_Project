@@ -2,11 +2,13 @@ package com.example.demo.domain.party.service;
 
 import com.example.demo.domain.party.dto.PartyCreateRequest;
 import com.example.demo.domain.party.dto.PartyListResponse;
+import com.example.demo.domain.party.dto.PartyMemberReponse;
 import com.example.demo.domain.party.dto.PartyUpdateRequest;
 import com.example.demo.domain.party.entity.*;
 import com.example.demo.domain.party.repository.PartyMapper;
 import com.example.demo.domain.party.repository.PartyMemberMapper;
 import com.example.demo.domain.saju.dto.SajuElementDto;
+import com.example.demo.domain.saju.entity.Saju;
 import com.example.demo.domain.saju.repository.SajuMapper;
 import com.example.demo.domain.saju.service.ChemistryService;
 import com.example.demo.domain.saju.util.FiveElement;
@@ -188,6 +190,13 @@ public class PartyService {
             case METAL -> PartySortBy.METAL;
             case WATER -> PartySortBy.WATER;
         };
+    }
+
+    // 파티원 목록 조회 (userId + 사주 동물 닉네임)
+    public List<PartyMemberReponse> getPartyMembers(Long partyId){
+        List<Long> memberIds = partyMemberMapper.findApprovedMemberIds(partyId);
+        return memberIds.stream()
+                .map(id -> new PartyMemberReponse(id, sajuMapper.findByUserId(id).map(Saju::getSajuAnimalName).orElse(null))).toList();
     }
 
     // 파티원 전체 오행 프로필 목록 조회
