@@ -22,7 +22,11 @@ export default function PartyCreatePage() {
     api
       .get("/users/me/games", { params: { gameId } })
       .then((res) => {
-        setGames(res.data.data);
+        const lsit = res.data.data;
+        setGames(list);
+        if (list.length > 0) {
+          setGameId(list[0].gameId); // 기본 선택값 지정
+        }
         setError(null);
       })
       .catch((err) => {
@@ -30,7 +34,7 @@ export default function PartyCreatePage() {
         setError("게임 목록을 불러오지 못했습니다.");
       })
       .finally(() => setGamesLoading(false));
-  }, [gameId]);
+  }, []);
 
   const hasNoGames = !gamesLoading && games.length === 0;
 
