@@ -45,4 +45,17 @@
     <delete id="deleteByUserIdAndGameId">
         DELETE FROM user_game WHERE user_id = #{userId} AND game_id = #{gameId}
     </delete>
+
+    <!--//메인페이지 이미지 가져올 때 사용-->
+    <select id="findAllGames" resultType="com.example.demo.domain.user.dto.UserGameResponse">
+        SELECT
+        game_id AS gameId,
+        name_ko AS name,
+        cover_url AS coverUrl,
+        genre AS genre,
+        FALSE AS isMain
+        FROM game
+        ORDER BY name_ko
+    </select>
+
 </mapper>

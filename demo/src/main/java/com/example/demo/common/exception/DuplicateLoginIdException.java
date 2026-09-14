@@ -6,3 +6,5 @@ public class DuplicateLoginIdException extends RuntimeException {
         super("이미 사용 중인 아이디입니다.");
     }
 }
+
+

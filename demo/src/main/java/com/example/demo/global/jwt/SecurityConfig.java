@@ -48,6 +48,7 @@ public class SecurityConfig {
                                 "/api/auth/birth-time-options"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/posts").permitAll()//게시판 목록 로그인 없이 허용
+                        .requestMatchers(HttpMethod.GET, "/api/games").permitAll()//게임 카탈로그 로그인 없이 허용
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",

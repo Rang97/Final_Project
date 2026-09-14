@@ -80,4 +80,10 @@ public class UserGameService {
         }
         return userId;
     }
+
+    // 메인페이지 이미지 가져올 때 사용
+    @Transactional(readOnly = true)
+    public List<UserGameResponse> getAllGames() {
+        return userGameMapper.findAllGames();
+    }
 }
