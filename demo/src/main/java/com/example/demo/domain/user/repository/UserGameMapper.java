@@ -25,4 +25,7 @@ public interface UserGameMapper {
     int setMain(@Param("userId") Long userId, @Param("gameId") Long gameId);
 
     int deleteByUserIdAndGameId(@Param("userId") Long userId, @Param("gameId") Long gameId);
+
+    // 메인페이지 이미지 가져올때 사용
+    List<UserGameResponse> findAllGames();
 }
