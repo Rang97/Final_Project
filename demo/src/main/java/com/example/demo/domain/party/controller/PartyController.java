@@ -7,8 +7,12 @@ import com.example.demo.domain.party.entity.ChemistryType;
 import com.example.demo.domain.party.entity.Party;
 import com.example.demo.domain.party.entity.PartySortBy;
 import com.example.demo.domain.party.entity.PartyStatus;
+import com.example.demo.domain.party.repository.PartyMemberMapper;
 import com.example.demo.domain.party.service.PartyMemberService;
 import com.example.demo.domain.party.service.PartyService;
+import com.example.demo.domain.saju.repository.SajuMapper;
+import com.example.demo.domain.saju.service.ChemistryService;
+import com.example.demo.domain.saju.util.GroupElementSummary;
 import com.example.demo.global.jwt.AuthenticatedUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,6 +39,9 @@ public class PartyController {
 
     private final PartyService partyService;
     private final PartyMemberService partyMemberService;
+    private final PartyMemberMapper partyMemberMapper;
+    private final SajuMapper sajuMapper;
+    private final ChemistryService chemistryService;
 
     // 파티 생성
     @PostMapping("/create")
@@ -63,7 +70,7 @@ public class PartyController {
     public ResponseEntity<Void> deleteParty(
             @Parameter(description = "삭제할 파티 ID", example = "1") @PathVariable Long partyId,
             @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser authenticatedUser
-    ){
+    ) {
         partyService.deleteParty(authenticatedUser.userId(), partyId);
         return ResponseEntity.noContent().build();
     }
@@ -81,7 +88,7 @@ public class PartyController {
             @Parameter(description = "추방할 사용자 ID", example = "2") @PathVariable Long userId, // 추방 대상 id
             @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser authenticatedUser // 추방 요청
 
-    ){
+    ) {
         partyService.deletePartyMember(authenticatedUser.userId(), partyId, userId);
         return ResponseEntity.noContent().build();
     }
@@ -92,7 +99,7 @@ public class PartyController {
     public ResponseEntity<Party> updateParty(
             @PathVariable Long partyId,
             @RequestBody PartyUpdateRequest request,
-            @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser user){
+            @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser user) {
         Party party = partyService.updateParty(user.userId(), partyId, request);
         return ResponseEntity.ok(party);
 
@@ -109,7 +116,7 @@ public class PartyController {
     public ResponseEntity<Void> joinParty(
             @Parameter(description = "가입할 파티 ID", example = "1") @PathVariable Long partyId,
             @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser authenticatedUser
-    ){
+    ) {
         partyMemberService.joinParty(partyId, authenticatedUser.userId());
         return ResponseEntity.ok().build();
     }
@@ -125,16 +132,16 @@ public class PartyController {
     public ResponseEntity<Void> leaveParty(
             @Parameter(description = "탈퇴할 파티 ID", example = "1") @PathVariable Long partyId,
             @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser authenticatedUser
-    ){
+    ) {
         partyMemberService.leaveParty(partyId, authenticatedUser.userId());
         return ResponseEntity.ok().build();
     }
 
     // 파티 단건 조회
     @GetMapping("/{partyId}")
-    public ResponseEntity<Party> getParty (
+    public ResponseEntity<Party> getParty(
             @PathVariable Long partyId
-    ){
+    ) {
         Party party = partyService.getParty(partyId);
         return ResponseEntity.ok(party);
     }
@@ -154,12 +161,21 @@ public class PartyController {
             @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser user,
             @Parameter(description = "게임 ID 필터, 비우면 전체")
             @RequestParam(required = false) Long gameId
-    ){
+    ) {
         List<PartyListResponse> parties = partyService.getPartyList(sortBy, ascending, user, gameId);
         return ResponseEntity.ok(parties);
     }
 
-
+    // 파티원 오행 현황 조회
+    @GetMapping("/{partyId}/chemistry")
+    @Operation(summary = "파티 오행 현황 조회", description = "파티원 전체의 오행 합계와 부족한 오행을 반환합니다.")
+    public ResponseEntity<GroupElementSummary> getPartyChemistry(
+            @Parameter(description = "파티 ID", example = "1")
+            @PathVariable Long partyId
+    ) {
+        GroupElementSummary summary = partyService.getPartyChemistry(partyId);
+        return ResponseEntity.ok(summary);
+    }
 
 
 }

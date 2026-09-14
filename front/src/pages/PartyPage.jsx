@@ -1,108 +1,170 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  Listbox,
+  ListboxButton,
+  ListboxOptions,
+  ListboxOption,
+} from "@headlessui/react";
+import { api } from "../api/client";
+import { useNavigate } from "react-router-dom";
+import { BiSolidUpArrow } from "react-icons/bi";
+import ErrorToast from "../components/ErrorToast";
+import PartyChatModal from "../components/PartyChatModal";
 
-const sortOptions = ["최신순", "인기순", "마감임박"];
+// 정렬 라벨: 백엔드 PartySortBy enum 매핑
 
-const parties = [
-  {
-    id: 1,
-    game: "리그 오브 레전드",
-    title: "다이아 랭크 듀오 구합니다 — 원딜 or 서폿",
-    description: "오후 9시~새벽 1시 주로 플레이. 욕설 금지, 소통 중시합니다.",
-    host: "Xenocraft",
-    hostTier: "다이아 I",
-    slots: 1,
-    totalSlots: 2,
-    mode: "랭크",
-    tags: ["원딜", "서폿", "소통 중시"],
-    date: "2시간 전",
-  },
-  {
-    id: 2,
-    game: "발로란트",
-    title: "레디언트 5스택 파티원 2명 모집",
-    description: "주말 스크림 팀 구성 중. 포지션 무관, 소통 필수.",
-    host: "NightOwl",
-    hostTier: "레디언트",
-    slots: 2,
-    totalSlots: 5,
-    mode: "경쟁전",
-    tags: ["5스택", "스크림", "주말"],
-    date: "4시간 전",
-  },
-  {
-    id: 3,
-    game: "배틀그라운드",
-    title: "스쿼드 닭저녁 도전! 초보 환영",
-    description: "부담 없이 즐겁게 한 판 하실 분. 승패보다 재미 중시.",
-    host: "ChickenLover",
-    hostTier: "골드",
-    slots: 3,
-    totalSlots: 4,
-    mode: "일반",
-    tags: ["초보 환영", "즐겜", "스쿼드"],
-    date: "30분 전",
-  },
-  {
-    id: 4,
-    game: "오버워치 2",
-    title: "플래티넘 탱커 파티 모집 — 딜/힐 구함",
-    description: "시즌 컷 올리는 게 목표. 분위기 좋은 분들만.",
-    host: "IronClad",
-    hostTier: "플래티넘 II",
-    slots: 2,
-    totalSlots: 3,
-    mode: "랭크",
-    tags: ["딜러", "힐러"],
-    date: "1시간 전",
-  },
-  {
-    id: 5,
-    game: "리그 오브 레전드",
-    title: "챌린저 코치 무료 강의 — 골드 이하 신청 가능",
-    description: "보이스 필수. 리플레이 분석 후 피드백 제공합니다.",
-    host: "ProCoach",
-    hostTier: "챌린저",
-    slots: 3,
-    totalSlots: 3,
-    mode: "코칭",
-    tags: ["코칭", "골드 이하", "보이스"],
-    date: "5시간 전",
-  },
-  {
-    id: 6,
-    game: "메이플스토리",
-    title: "아케인리버 일반몹 사냥 파티 — 보스 협력 가능",
-    description: "주 3회 이상 접속하시는 분. 지역 무관.",
-    host: "MapleVet",
-    hostTier: "Lv.280+",
-    slots: 4,
-    totalSlots: 6,
-    mode: "협동",
-    tags: ["사냥", "보스", "주3회"],
-    date: "3시간 전",
-  },
+// 오행 그룹
+const elementSortOptions = [
+  { label: "목", value: "WOOD" },
+  { label: "화", value: "FIRE" },
+  { label: "토", value: "EARTH" },
+  { label: "금", value: "METAL" },
+  { label: "수", value: "WATER" },
 ];
 
-export default function PartyPage() {
-  const [activeSort, setActiveSort] = useState("최신순");
-  const [joined, setJoined] = useState([]);
+// 방제 / 장르 그룹
+const titleGenreOptions = [
+  { label: "최신순", value: undefined },
+  { label: "방제", value: "TITLE" },
+  { label: "장르", value: "GENRE" },
+];
 
-  const handleJoin = (id) => {
-    setJoined((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
-  };
+// 인원수 / 궁합매칭 그룹
+const memberSortOptions = [
+  { label: "인원수", value: "MEMBER_COUNT" },
+  { label: "궁합매칭", value: "CHEMISTRY_MATCH" },
+];
+
+// 궁합 유형 한글 라벨 매핑
+const chemistryLabels = {
+  SYNERGY: "상생",
+  RIVAL: "상극",
+  BALANCED: "균형",
+};
+
+// 상대 시간 계산 로직
+function getRelativeTime(createdAt) {
+  const diffMs = new Date() - new Date(createdAt);
+  const diffMin = Math.floor(diffMs / 60000);
+
+  if (diffMin < 1) return "방금 전";
+  if (diffMin < 60) return `${diffMin}분 전`;
+
+  const diffHour = Math.floor(diffMin / 60);
+  if (diffHour < 24) return `${diffHour}시간 전`;
+
+  const diffDay = Math.floor(diffHour / 24);
+  return `${diffDay}일 전`;
+}
+
+// 정렬 드롭다운 공통 컴포넌트
+function SortDropdown({ placeholder, options, sortBy, onChange }) {
+  const selected = options.find((opt) => opt.value === sortBy);
 
   return (
-    <div className="max-w-6xl mx-auto px-6 md:px-10 py-12">
-      {/* Header */}
-      <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
-        <div>
+    <Listbox value={selected ? selected.value : ""} onChange={onChange}>
+      <ListboxButton
+        className="w-40 px-4 py-1.5 rounded text-sm font-medium outline-none text-left whitespace-nowrap overflow-hidden text-ellipsis"
+        style={{
+          background: "#0f0f1a",
+          color: selected ? "#F1FF5E" : "#c0c0e0",
+        }}
+      >
+        {selected ? selected.label : placeholder}
+      </ListboxButton>
+      <ListboxOptions
+        transition
+        anchor="bottom start"
+        className="mt-1 rounded text-sm overflow-hidden z-10 origin-top outline-none transition duration-150 ease-out data-[closed]:opacity-0 data-[closed]:-translate-y-2"
+        style={{
+          background: "#0f0f1a",
+        }}
+      >
+        <ListboxOption
+          value=""
+          className="px-4 py-2 cursor-pointer transition-colors text-[#9CA3AF] aria-selected:text-[#F1FF5E] hover:text-[#F1FF5E] hover:bg-[rgba(124,58,237,0.25)] data-[focus]:bg-[rgba(124,58,237,0.2)]"
+        >
+          {placeholder}
+        </ListboxOption>
+        {options.map((opt) => (
+          <ListboxOption
+            key={opt.value}
+            value={opt.value}
+            className="px-4 py-2 cursor-pointer transition-colors text-[#c0c0e0] aria-selected:text-[#F1FF5E] hover:text-[#F1FF5E] hover:bg-[rgba(124,58,237,0.25)] data-[focus]:bg-[rgba(124,58,237,0.2)]"
+          >
+            {opt.label}
+          </ListboxOption>
+        ))}
+      </ListboxOptions>
+    </Listbox>
+  );
+}
+
+export default function PartyPage() {
+  const navigate = useNavigate();
+  const [parties, setParties] = useState([]); // 파티 목록
+  const [loading, setLoading] = useState(true); // 로딩
+  const [sortBy, setSortBy] = useState(undefined); // 기본 최신순
+  const [ascending, setAscending] = useState(true); // 오름/내림
+  const [joined, setJoined] = useState([]); // 참가 파티 배열
+  const [error, setError] = useState(null); // 에러
+  const [activeChatParty, setActiveChatParty] = useState(null); // 채팅 띄울 대상 파티
+
+  // 드롭다운 선택 -> sortBy 갱신
+  const handleSortChange = (value) => {
+    setSortBy(value || undefined); // 빈 값 선택 시 정렬 해제 (최신순)
+  };
+
+  // 정렬 조건 넘겨서 목록 요청
+  useEffect(() => {
+    api
+      .get("/party/party-list", { params: { sortBy, ascending } })
+      .then((res) => {
+        setParties(res.data);
+        setError(null);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("파티 목록을 불러오지 못했습니다.");
+      })
+      .finally(() => setLoading(false));
+    // 정렬 기준 바뀔 때마다 자동 요청
+  }, [sortBy, ascending]);
+
+  // 성공 시 파티 목록 추가 (버튼 상태 즉시 변경)
+  const handleJoin = async (party) => {
+    try {
+      await api.post(`/party/${party.partyId}/join`);
+      setJoined((prev) => [...prev, party.partyId]);
+      // 바로 채팅 모달 오픈
+      setActiveChatParty(party);
+      setError(null);
+    } catch (err) {
+      setError(err.response?.data?.message ?? "참가에 실패했습니다.");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div
+        className="max-w-6xl mx-auto px-6 md:px-10 py-12 text-center"
+        style={{ color: "#6060a0" }}
+      >
+        불러오는 중...
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-6xl mx-auto px-6 md:px-10 py-12 ">
+      {/* 헤더 */}
+      <div className="flex mb-10 flex-wrap gap-4">
+        <div className="justify-content-center">
           <p
             className="text-xs uppercase tracking-widest mb-2"
-            style={{ color: "#7c3aed" }}
+            style={{ color: "#5690CC" }}
           >
-            파티 찾기
+            파티를 찾아 참여해 보세요!
           </p>
           <h1
             className="text-4xl font-bold"
@@ -111,213 +173,239 @@ export default function PartyPage() {
             파티 모집
           </h1>
         </div>
-        <button
-          className="px-5 py-2 rounded text-sm font-semibold"
-          style={{
-            background: "linear-gradient(135deg, #7c3aed, #5b21b6)",
-            color: "#fff",
-          }}
-        >
-          + 파티 만들기
-        </button>
       </div>
 
-      {/* Sort only */}
-      <div className="flex items-center gap-2 mb-8">
-        {sortOptions.map((opt) => (
+      {/* 정렬 */}
+      <div
+        className="flex items-center gap-3 mb-8"
+        style={{
+          color: "#c0c0e0",
+        }}
+      >
+        <div className="flex items-center gap-3 mb-8">
+          <SortDropdown
+            placeholder="오행"
+            options={elementSortOptions}
+            sortBy={sortBy}
+            onChange={handleSortChange}
+          />
+          <SortDropdown
+            placeholder="방제 / 장르"
+            options={titleGenreOptions}
+            sortBy={sortBy}
+            onChange={handleSortChange}
+          />
+          <SortDropdown
+            placeholder="인원수 / 궁합매칭"
+            options={memberSortOptions}
+            sortBy={sortBy}
+            onChange={handleSortChange}
+          />
           <button
-            key={opt}
-            onClick={() => setActiveSort(opt)}
-            className="px-4 py-1.5 rounded text-sm font-medium transition-all"
-            style={
-              activeSort === opt
-                ? {
-                    background: "rgba(124,58,237,0.2)",
-                    color: "#a78bfa",
-                    border: "1px solid rgba(124,58,237,0.4)",
-                  }
-                : {
-                    background: "#0f0f1a",
-                    color: "#4a4a70",
-                    border: "1px solid rgba(255,255,255,0.06)",
-                  }
-            }
+            className="px-4 py-1.5 rounded text-sm font-medium"
+            onClick={() => setAscending((prev) => !prev)}
+            style={{
+              background: "#0f0f1a",
+              color: ascending ? "#F1FF5E" : "#c0c0e0",
+              transition: "all 0.3s ease-in 0s",
+            }}
           >
-            {opt}
-          </button>
-        ))}
-      </div>
-
-      {/* Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {parties.map((party) => {
-          const isJoined = joined.includes(party.id);
-          const isFull = party.slots === 0;
-          const filled = party.totalSlots - party.slots;
-
-          return (
-            <div
-              key={party.id}
-              className="rounded flex flex-col overflow-hidden transition-transform hover:-translate-y-0.5"
+            <span
               style={{
-                background: "#0f0f1a",
-                border: "1px solid rgba(255,255,255,0.07)",
+                display: "inline-block",
+                transition: "transform 0.25s ease",
+                transform: ascending ? "rotate(0deg)" : "rotate(180deg)",
               }}
             >
-              {/* Top accent line — single consistent color */}
+              <BiSolidUpArrow size={16} />
+            </span>
+          </button>
+          <button
+            className="brand-gradient-btn px-5 py-2 rounded-xl text-sm font-semibold text-white ml-35"
+            onClick={() => navigate("/party/create")}
+          >
+            파티 생성
+          </button>
+        </div>
+      </div>
+
+      {/* error */}
+      <ErrorToast message={error} onClose={() => setError(null)} />
+
+      {/* 파티 카드: 없을 시 안내 문구 출력 */}
+      {parties.length === 0 ? (
+        <p className="text-center py-20 text-sm" style={{ color: "#3A9AFF" }}>
+          등록된 파티가 없습니다.
+        </p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {parties.map((party) => {
+            const isJoined = party.joined || joined.includes(party.partyId);
+            // FULL/COMPLETED/CLOSED 모두 참가 불가
+            const isFull = party.status !== "RECRUITING";
+
+            return (
               <div
-                className="h-0.5 w-full"
+                key={party.partyId}
+                className="party-card relative flex flex-col overflow-hidden rounded-2x1 border border-[rgba(58,154,255,0.15)] shadow-[0_2px_10px_rgba(0,0,0,0.3)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(58,154,255,0.2)]"
                 style={{
-                  background: "linear-gradient(90deg, #7c3aed, transparent)",
+                  minHeight: "260px",
+                  backgroundImage: party.coverUrl
+                    ? `linear-gradient(to bottom right, rgba(7,7,14,0.9) 0%, rgba(7,7,14,0.55) 55%, rgba(7,7,14,0.15) 100%), url(${party.coverUrl})`
+                    : "linear-gradient(160deg, #1C0770 0%, #0f0f1a 70%)",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
                 }}
-              />
-
-              <div className="p-5 flex flex-col gap-3 flex-1">
-                {/* Game + mode */}
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span
-                    className="text-xs font-semibold px-2 py-0.5 rounded"
-                    style={{
-                      background: "rgba(124,58,237,0.15)",
-                      color: "#a78bfa",
-                    }}
-                  >
-                    {party.game}
-                  </span>
-                  <span
-                    className="text-xs px-2 py-0.5 rounded"
-                    style={{
-                      background: "rgba(255,255,255,0.05)",
-                      color: "#4a4a70",
-                    }}
-                  >
-                    {party.mode}
-                  </span>
-                  <span
-                    className="ml-auto text-xs"
-                    style={{ color: "#4a4a70" }}
-                  >
-                    {party.date}
-                  </span>
-                </div>
-
-                {/* Title */}
-                <p
-                  className="font-bold text-sm leading-snug"
-                  style={{
-                    fontFamily: "'Rajdhani', sans-serif",
-                    color: "#e8e8f0",
-                    fontSize: "1rem",
-                  }}
+              >
+                <svg
+                  className="absolute inset-0 pointer-events-none z-10"
+                  width="100%"
+                  height="100%"
                 >
-                  {party.title}
-                </p>
-
-                {/* Description */}
-                <p
-                  className="text-xs leading-relaxed"
-                  style={{ color: "#4a4a70" }}
-                >
-                  {party.description}
-                </p>
-
-                {/* Tags */}
-                <div className="flex flex-wrap gap-1">
-                  {party.tags.map((tag) => (
+                  <defs>
+                    <linearGradient
+                      id={`cardGradient-${party.partyId}`}
+                      x1="0%"
+                      y1="0%"
+                      x2="100%"
+                      y2="100%"
+                    >
+                      <stop offset="0%" stopColor="#3A9AFF" />
+                      <stop offset="100%" stopColor="#F1FF5E" />
+                    </linearGradient>
+                  </defs>
+                  <rect
+                    x="1"
+                    y="1"
+                    width="calc(100% - 2px)"
+                    height="calc(100% - 2px)"
+                    rx="16"
+                    ry="16"
+                    pathLength="100"
+                    fill="none"
+                    stroke={`url(#cardGradient-${party.partyId})`}
+                    strokeWidth="2"
+                    className="card-outline"
+                  />
+                </svg>
+                <div className="p-5 flex flex-col justify-between flex-1 gap-3 ">
+                  {/* 게임 배지 + 궁합유형 태그 + 시간 */}
+                  <div className="flex items-center gap-2 flex-wrap ">
                     <span
-                      key={tag}
-                      className="text-xs px-2 py-0.5 rounded"
+                      className="text-xs font-semibold px-2 py-0.5 rounded"
                       style={{
-                        background: "rgba(255,255,255,0.04)",
-                        color: "#6060a0",
+                        background: "rgba(15,15,26,0.85)",
+                        color: "#3A9AFF",
+                        border: "1px solid rgba(58,154,255,0.4)",
                       }}
                     >
-                      #{tag}
+                      {party.gameName}
                     </span>
-                  ))}
-                </div>
+                    <span
+                      className="text-xs font-semibold px-2 py-0.5 rounded"
+                      style={{
+                        background: "rgba(15,15,26,0.85)",
+                        color: "#F1FF5E",
+                        border: "1px solid rgba(241,255,94,0.4)",
+                      }}
+                    >
+                      {chemistryLabels[party.chemistryType]}
+                    </span>
+                    <span
+                      className="ml-auto text-xs"
+                      style={{ color: "rgba(255,255,255,0.75)" }}
+                    >
+                      {getRelativeTime(party.createdAt)}
+                    </span>
+                  </div>
 
-                {/* Divider */}
-                <div
-                  className="h-px"
-                  style={{ background: "rgba(255,255,255,0.05)" }}
-                />
-
-                {/* Host + slots */}
-                <div className="flex items-center gap-3">
-                  <div
-                    className="w-7 h-7 rounded flex items-center justify-center text-xs font-bold flex-shrink-0"
+                  {/* 방제 */}
+                  <p
+                    className="font-bold text-lg leading-snug"
                     style={{
-                      background: "rgba(124,58,237,0.2)",
-                      color: "#a78bfa",
+                      fontFamily: "'Rajdhani', sans-serif",
+                      color: "#fff",
+                      textShadow: "0 2px 8px rgba(0,0,0,0.6)",
                     }}
                   >
-                    {party.host[0]}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p
-                      className="text-xs font-semibold truncate"
-                      style={{ color: "#c0c0e0" }}
-                    >
-                      {party.host}
-                    </p>
-                    <p className="text-xs" style={{ color: "#4a4a70" }}>
-                      {party.hostTier}
-                    </p>
-                  </div>
-                  {/* Slot dots */}
-                  <div className="flex items-center gap-1 flex-shrink-0">
-                    {Array.from({ length: party.totalSlots }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="w-2 h-2 rounded-full"
-                        style={{
-                          background:
-                            i < filled ? "#7c3aed" : "rgba(255,255,255,0.1)",
-                        }}
-                      />
-                    ))}
+                    {party.title}
+                  </p>
+
+                  {/* 인원수 + 방장 닉네임 */}
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: party.maxMemberCount }).map(
+                        (_, i) => (
+                          <div
+                            key={i}
+                            className="w-2 h-2"
+                            style={{
+                              background:
+                                i < party.nowMemberCount
+                                  ? "#3A9AFF"
+                                  : "rgba(255,255,255,0.2)",
+                            }}
+                          />
+                        ),
+                      )}
+                      <span
+                        className="text-xs ml-1"
+                        style={{ color: "rgba(255,255,255,0.75)" }}
+                      >
+                        {party.nowMemberCount}/{party.maxMemberCount}
+                      </span>
+                    </div>
+
                     <span
-                      className="text-xs ml-1.5"
-                      style={{ color: "#4a4a70" }}
+                      className="text-xs"
+                      style={{ color: "rgba(255,255,255,0.5)" }}
                     >
-                      {filled}/{party.totalSlots}
+                      {party.hostNickname}
                     </span>
                   </div>
-                </div>
 
-                {/* Join button */}
-                <button
-                  onClick={() => handleJoin(party.id)}
-                  disabled={isFull && !isJoined}
-                  className="w-full py-2.5 rounded text-sm font-semibold transition-all mt-1"
-                  style={
-                    isJoined
-                      ? {
-                          background: "rgba(6,214,160,0.12)",
-                          color: "#06d6a0",
-                          border: "1px solid rgba(6,214,160,0.25)",
-                        }
-                      : isFull
+                  {/* 참가 버튼 */}
+                  <button
+                    onClick={() =>
+                      isJoined ? setActiveChatParty(party) : handleJoin(party)
+                    }
+                    disabled={isFull && !isJoined}
+                    className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                      !isJoined && !isFull
+                        ? "brand-gradient-btn text-white"
+                        : ""
+                    }`}
+                    style={
+                      isJoined
                         ? {
-                            background: "#1a1a2e",
-                            color: "#4a4a70",
-                            cursor: "not-allowed",
+                            background: "rgba(241,255,94,0.12)",
+                            color: "#F1FF5E",
+                            border: "1px solid rgba(241,255,94,0.3)",
                           }
-                        : {
-                            background:
-                              "linear-gradient(135deg, #7c3aed, #5b21b6)",
-                            color: "#fff",
-                          }
-                  }
-                >
-                  {isJoined ? "✓ 참가 완료" : isFull ? "마감" : "참가 신청"}
-                </button>
+                        : isFull
+                          ? {
+                              background: "#1a1a2e",
+                              color: "#4a4a70",
+                              cursor: "not-allowed",
+                            }
+                          : undefined
+                    }
+                  >
+                    {isJoined ? "✓ 채팅" : isFull ? "마감" : "참가 신청"}
+                  </button>
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
+
+      {activeChatParty && (
+        <PartyChatModal
+          party={activeChatParty}
+          onClose={() => setActiveChatParty(null)}
+        />
+      )}
     </div>
   );
 }

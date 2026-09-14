@@ -5,6 +5,8 @@ import BoardDetailPage from "./pages/BoardDetailPage";
 import PartyPage from "./pages/PartyPage";
 import MyPage from "./pages/MyPage";
 import LoginPage from "./pages/LoginPage";
+import Layout from "./components/Layout";
+import PartyCreatePage from "./pages/PartyCreatePage";
 import BoardWritePage from "./pages/BoardWritePage";
 import BoardEditPage from "./pages/BoardEditPage";
 import Layout from "./components/Layout";
@@ -24,7 +26,8 @@ export default function App() {
           <Route path="/board/:id/edit" element={<RequireAuth><BoardEditPage /></RequireAuth>} />
           <Route path="/board/:id" element={<BoardDetailPage />} />
           <Route path="/party" element={<PartyPage />} />
-          <Route path="/mypage" element={<RequireAuth><MyPage /></RequireAuth>} />
+          <Route path="/party/create" element={<PartyCreatePage />}></Route>
+          <Route path="/mypage" element={<MyPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

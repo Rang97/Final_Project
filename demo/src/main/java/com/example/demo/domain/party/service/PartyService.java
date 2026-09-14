@@ -168,6 +168,10 @@ public class PartyService {
             Comparator<PartyListResponse> comparator = Comparator.comparingDouble(p -> getElementScore(p.getPartyId(), element));
             parties.sort(ascending ? comparator : comparator.reversed());
         }
+        Long myActivePartyId = partyMemberMapper.findActivePartyIdByUserId(user.userId());
+        for (PartyListResponse p : parties) {
+            p.setJoined(p.getPartyId().equals(myActivePartyId));
+        }
         return parties;
     }
 
@@ -186,17 +190,25 @@ public class PartyService {
         };
     }
 
-    // 파티 하나의 특정 오행 합산 점수 계산
-    private double getElementScore(Long partyId, FiveElement element) {
+    // 파티원 전체 오행 프로필 목록 조회
+    private List<FiveElementProfile> getGroupProfiles(Long partyId) {
         List<Long> memberIds = partyMemberMapper.findApprovedMemberIds(partyId);
         if (memberIds.isEmpty()) {
-            return 0;
+            return List.of();
         }
-
-        List<FiveElementProfile> profiles = sajuMapper.findElementsByUserId(memberIds).stream()
+        return sajuMapper.findElementsByUserId(memberIds).stream()
                 .map(SajuElementDto::toProfile)
                 .toList();
-        GroupElementSummary summary = chemistryService.summarizeGroup(profiles);
+    }
+
+    // 파티 오행 현황 조회
+    public GroupElementSummary getPartyChemistry(Long partyId) {
+        return chemistryService.summarizeGroup(getGroupProfiles(partyId));
+    }
+
+    // 파티 하나의 특정 오행 합산 점수 계산
+    private double getElementScore(Long partyId, FiveElement element) {
+        GroupElementSummary summary = chemistryService.summarizeGroup(getGroupProfiles(partyId));
 
         return switch (element){
             case WOOD -> summary.totalWood();
@@ -206,6 +218,8 @@ public class PartyService {
             case WATER -> summary.totalWater();
         };
     }
+
+
 
 
 }
