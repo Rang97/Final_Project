@@ -10,16 +10,17 @@ import {
 import ErrorToast from "./ErrorToast";
 
 export default function PartyChatModal({ party, onClose }) {
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
-  const [myAnimalName, setMyAnimalName] = useState(null);
+  const [messages, setMessages] = useState([]); // 메시지 배열
+  const [input, setInput] = useState(""); // 입력창 값
+  const [myAnimalName, setMyAnimalName] = useState(null); // 사주 닉
   const stompClientRef = useRef(null);
-  const [showDetail, setShowDetail] = useState(false);
-  const [chemistry, setChemistry] = useState(null);
-  const [visible, setVisible] = useState(false);
-  const [hoveredElement, setHoveredElement] = useState(null);
+  const [showDetail, setShowDetail] = useState(false); // 오행 패널
+  const [chemistry, setChemistry] = useState(null); // 오행 데이터
+  const [visible, setVisible] = useState(false); // 모달 애니메이션
+  const [hoveredElement, setHoveredElement] = useState(null); // 오행 중 마우스 올린 항목
   const [error, setError] = useState(null);
 
+  // 내 닉네임 조회
   useEffect(() => {
     api
       .get("/mypage/saju")
@@ -27,6 +28,7 @@ export default function PartyChatModal({ party, onClose }) {
       .catch((err) => console.error(err));
   }, []);
 
+  // STOMP 연결
   useEffect(() => {
     const client = new Client({
       brokerURL: "ws://localhost:8080/ws",
@@ -44,7 +46,7 @@ export default function PartyChatModal({ party, onClose }) {
         setError(frame.headers["message"] ?? "채팅 연결에 실패했습니다.");
       },
       onWebSocketError: () => {
-        setError("채팅 서버에 연결할 수 업습니다.");
+        setError("채팅 서버에 연결할 수 없습니다.");
       },
     });
 
@@ -56,15 +58,19 @@ export default function PartyChatModal({ party, onClose }) {
     };
   }, [party.partyId]);
 
+  //
   useEffect(() => {
     const id = requestAnimationFrame(() => setVisible(true));
     return () => cancelAnimationFrame(id);
   }, []);
 
+  // 상세 패널
   const handleToggleDetail = (e) => {
     e.stopPropagation();
+    // 패널 열 때만 API 호출
     if (!showDetail && !chemistry) {
       api
+        // 파티원 전체 오행 합계 조회
         .get(`/party/${party.partyId}/chemistry`)
         .then((res) => setChemistry(res.data))
         .catch((err) => console.error(err));
@@ -77,13 +83,17 @@ export default function PartyChatModal({ party, onClose }) {
     setTimeout(onClose, 300);
   };
 
+  // 전송
   const handleSend = (e) => {
     e.preventDefault();
+    // 빈 메시지 전송 방지
     if (!input.trim()) return;
+    // 서버로 메시지 발행
     stompClientRef.current.publish({
       destination: "/pub/party/" + party.partyId + "/chat",
       body: JSON.stringify({ content: input.trim() }),
     });
+    // 전송 후 입력창 비움
     setInput("");
   };
 
@@ -94,6 +104,7 @@ export default function PartyChatModal({ party, onClose }) {
       onClick={handleClose}
     >
       <ErrorToast message={error} onClose={() => setError(null)} />
+
       <div
         className="absolute bottom-6 right-6 flex items-stretch transition-all duration-300"
         style={{
@@ -113,7 +124,7 @@ export default function PartyChatModal({ party, onClose }) {
             borderRight: "none",
           }}
         >
-          <div className="w-[260px] shrink-0 h-full flex flex-col px-5 py-4 gap-4">
+          <div className="w-65 shrink-0 h-full flex flex-col px-5 py-4 gap-4">
             {!chemistry ? (
               <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
                 불러오는 중...
@@ -135,12 +146,14 @@ export default function PartyChatModal({ party, onClose }) {
                   className="text-[13px] text-center"
                   style={{ color: "#e8e8f0" }}
                 >
+                  {/* 많은 오행, 적은 오행 다른 문구 표시 */}
                   {chemistry.maxElements?.[0] === chemistry.minElements?.[0]
                     ? "오행이 고르게 분포돼 있어요"
                     : `${ELEMENT_LABELS[chemistry.maxElements?.[0]]} 기운이 강하고, ${ELEMENT_LABELS[chemistry.minElements?.[0]]} 기운이 부족해요`}
                 </p>
 
                 <div className="flex gap-2">
+                  {/* 각 오행별 합계 숫자 표시 */}
                   {Object.keys(ELEMENT_LABELS).map((key) => {
                     const total = chemistry[ELEMENT_TOTAL_KEYS[key]];
                     const isLacking = chemistry.minElements?.includes(key);
@@ -258,7 +271,9 @@ export default function PartyChatModal({ party, onClose }) {
 
           <div className="flex-1 min-h-0 overflow-y-auto px-5 py-4 flex flex-col gap-4">
             {messages.map((msg, i) => {
+              // 내가 보낸 메시지인지 판별
               const isMine = msg.sender === myAnimalName;
+              // 연속 메시지는 발신자/시간 표시 생략 (앞뒤 참조)
               const prev = messages[i - 1];
               const next = messages[i + 1];
               const formatTime = (t) =>
@@ -267,7 +282,9 @@ export default function PartyChatModal({ party, onClose }) {
                   minute: "2-digit",
                 });
 
+              // 메시지 발신자 다르면 이름 표시
               const showSender = !prev || prev.sender !== msg.sender;
+              // 메시지 발신자 다르면 시간 표시
               const showTimestamp =
                 !next ||
                 next.sender !== msg.sender ||
