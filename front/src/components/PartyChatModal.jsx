@@ -7,6 +7,7 @@ import {
   ELEMENT_LABELS,
   ELEMENT_TOTAL_KEYS,
 } from "../constants/fiveElements";
+import ErrorToast from "./ErrorToast";
 
 export default function PartyChatModal({ party, onClose }) {
   const [messages, setMessages] = useState([]);
@@ -17,6 +18,7 @@ export default function PartyChatModal({ party, onClose }) {
   const [chemistry, setChemistry] = useState(null);
   const [visible, setVisible] = useState(false);
   const [hoveredElement, setHoveredElement] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     api
@@ -36,6 +38,13 @@ export default function PartyChatModal({ party, onClose }) {
           const data = JSON.parse(message.body);
           setMessages((prev) => [...prev, data]);
         });
+      },
+      onStompError: (frame) => {
+        console.error(frame);
+        setError(frame.headers["message"] ?? "채팅 연결에 실패했습니다.");
+      },
+      onWebSocketError: () => {
+        setError("채팅 서버에 연결할 수 업습니다.");
       },
     });
 
@@ -84,6 +93,7 @@ export default function PartyChatModal({ party, onClose }) {
       style={{ background: "transparent" }}
       onClick={handleClose}
     >
+      <ErrorToast message={error} onClose={() => setError(null)} />
       <div
         className="absolute bottom-6 right-6 flex items-stretch transition-all duration-300"
         style={{
