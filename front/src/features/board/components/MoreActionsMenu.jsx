@@ -24,6 +24,8 @@ export default function MoreActionsMenu({ actions }) {
   return (
     <div className="relative" ref={menuRef}>
       <button
+        aria-label="더 보기"
+        aria-expanded={isOpen}
         onClick={() => setIsOpen((prev) => !prev)}
         className="p-2 rounded-sm hover:bg-white/10 text-slate-300 hover:text-white transition-colors cursor-pointer"
       >

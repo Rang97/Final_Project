@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
+import { useAuthStore } from "../store/authStore";
+
 const navItems = [
   { label: "홈", to: "/" },
   { label: "게시판", to: "/board" },
@@ -11,6 +13,12 @@ const navItems = [
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
+  const logout = () => {
+    useAuthStore.getState().clearSession();
+    setMenuOpen(false);
+    navigate("/");
+  };
 
   return (
     <nav
@@ -65,21 +73,23 @@ export default function Navbar() {
         <button
           className="text-sm px-4 py-2 rounded font-medium transition-colors"
           style={{ color: "rgba(240,240,250,0.45)" }}
-          onClick={() => navigate("/login")}
+          onClick={() => navigate(user ? "/mypage" : "/login")}
         >
-          로그인
+          {user ? user.nickname : "로그인"}
         </button>
         <button
           className="text-sm px-5 py-2 rounded font-semibold transition-all hover:brightness-110"
           style={{ background: "#F1FF5E", color: "#06040f" }}
-          onClick={() => navigate("/login")}
+          onClick={user ? logout : () => navigate("/signup")}
         >
-          회원가입
+          {user ? "로그아웃" : "회원가입"}
         </button>
       </div>
 
       {/* Mobile hamburger */}
       <button
+        aria-label="메뉴 열기"
+        aria-expanded={menuOpen}
         className="md:hidden flex flex-col gap-1.5 p-2"
         onClick={() => setMenuOpen(!menuOpen)}
       >
@@ -107,9 +117,7 @@ export default function Navbar() {
               to={item.to}
               end={item.to === "/"}
               onClick={() => setMenuOpen(false)}
-              className={({ isActive }) =>
-                `px-4 py-3 rounded text-sm font-medium ${isActive ? "" : ""}`
-              }
+              className="px-4 py-3 rounded text-sm font-medium"
               style={({ isActive }) =>
                 isActive
                   ? { background: "rgba(58,154,255,0.12)", color: "#3A9AFF" }
@@ -131,20 +139,21 @@ export default function Navbar() {
               }}
               onClick={() => {
                 setMenuOpen(false);
-                navigate("/login");
+                navigate(user ? "/mypage" : "/login");
               }}
             >
-              로그인
+              {user ? user.nickname : "로그인"}
             </button>
             <button
               className="flex-1 py-2 rounded text-sm font-semibold"
               style={{ background: "#F1FF5E", color: "#06040f" }}
               onClick={() => {
                 setMenuOpen(false);
-                navigate("/login");
+                if (user) logout();
+                else navigate("/signup");
               }}
             >
-              회원가입
+              {user ? "로그아웃" : "회원가입"}
             </button>
           </div>
         </div>
