@@ -15,11 +15,11 @@ import {
   unblock,
 } from "../features/mypage/mypageApi";
 
-const panel = "rounded-xl border border-white/10 bg-[#10101c] p-5 md:p-7";
+const panel = "rounded border border-[#3A9AFF]/10 bg-[#0d0b1e] p-5 md:p-7";
 const button =
-  "rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-40 hover:bg-violet-500";
+  "rounded bg-[#F1FF5E] px-4 py-2 text-sm font-bold text-[#06040f] disabled:opacity-40 hover:brightness-110 transition-all";
 const field =
-  "w-full rounded-lg border border-white/15 bg-[#191927] px-3 py-3 text-sm text-white";
+  "w-full rounded border border-[#3A9AFF]/15 bg-[#100e25] px-3 py-3 text-sm text-white";
 const elements = [
   ["wood", "목", "木", "#34d399"],
   ["fire", "화", "火", "#fb7185"],
@@ -179,11 +179,11 @@ export default function MyPage() {
     summary?.games?.find((game) => game.gameId === id)?.name || `게임 ${id}`;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 md:px-8 py-10 space-y-6 text-[#e8e8f0]">
+    <div className="max-w-4xl mx-auto px-6 md:px-10 py-10 space-y-6 text-[#f0f0fa] selection:bg-[#F1FF5E] selection:text-[#1C0770]">
       <header
-        className={`${panel} bg-gradient-to-br from-violet-950/60 to-[#10101c]`}
+        className={`${panel} bg-gradient-to-br from-[#261CC1]/25 to-[#0d0b1e]`}
       >
-        <p className="text-xs tracking-widest text-violet-300 mb-3">
+        <p className="text-xs tracking-widest text-[#3A9AFF] mb-3">
           MY PROFILE
         </p>
         <h1 className="text-3xl font-bold break-words">
@@ -228,7 +228,7 @@ export default function MyPage() {
             </p>
             <a
               href="#saju-edit"
-              className="inline-block mt-3 text-violet-300 underline"
+              className="inline-block mt-3 text-[#3A9AFF] underline"
             >
               사주 정보 입력하기
             </a>
@@ -244,7 +244,7 @@ export default function MyPage() {
                 return (
                   <article
                     key={key}
-                    className="rounded-xl border p-4 bg-white/[0.02]"
+                    className="rounded border p-4 bg-white/[0.02]"
                     style={{ borderColor: dominant ? color : "#ffffff18" }}
                   >
                     <span className="text-2xl" style={{ color }}>
@@ -282,7 +282,7 @@ export default function MyPage() {
             </div>
             <dl className="grid grid-cols-4 gap-3 mt-5 text-center">
               {pillars.map(([key, label]) => (
-                <div key={key} className="rounded-lg bg-white/5 py-3">
+                <div key={key} className="rounded bg-white/5 py-3">
                   <dt className="text-xs text-slate-400">{label}</dt>
                   <dd className="mt-1">
                     {saju[`${key}Stem`] || "—"} {saju[`${key}Branch`] || "—"}
@@ -334,17 +334,17 @@ export default function MyPage() {
           </p>
         )}
         {fortuneBusy && (
-          <p role="status" className="mt-4 text-violet-300">
+          <p role="status" className="mt-4 text-[#3A9AFF]">
             처음 생성할 때는 시간이 걸릴 수 있습니다.
           </p>
         )}
         {fortune && (
           <div className="mt-6 space-y-4">
-            <p className="text-sm text-violet-300">
+            <p className="text-sm text-[#3A9AFF]">
               {fortune.date} · {fortune.oneLineMessage}
             </p>
-            <article className="rounded-xl bg-violet-500/10 p-5">
-              <p className="text-3xl font-bold text-violet-300">
+            <article className="rounded bg-[#261CC1]/20 p-5">
+              <p className="text-3xl font-bold text-[#3A9AFF]">
                 {fortune.overallFortune.score}
                 <span className="text-sm"> / 100</span>
               </p>
@@ -359,9 +359,9 @@ export default function MyPage() {
               {fortune.gameFortunes?.map((item) => (
                 <article
                   key={item.gameId}
-                  className="rounded-xl border border-white/10 p-4"
+                  className="rounded border border-[#3A9AFF]/10 p-4"
                 >
-                  <p className="text-xs text-violet-300">
+                  <p className="text-xs text-[#3A9AFF]">
                     {gameName(item.gameId)} · {item.score}점
                   </p>
                   <h3 className="font-semibold mt-2">{item.title}</h3>
@@ -380,7 +380,7 @@ export default function MyPage() {
               ))}
             </div>
             {fortune.dailyQuest && (
-              <article className="rounded-xl bg-white/5 p-4">
+              <article className="rounded bg-white/5 p-4">
                 <h3 className="font-semibold">
                   오늘의 퀘스트 · {fortune.dailyQuest.title}
                 </h3>
@@ -415,7 +415,7 @@ export default function MyPage() {
         ) : blocks.length === 0 ? (
           <p className="text-sm text-slate-400">차단한 유저가 없습니다.</p>
         ) : (
-          <ul className="divide-y divide-white/10">
+          <ul className="divide-y divide-[#3A9AFF]/10">
             {blocks.map((item) => (
               <li
                 key={item.blockedUserId}

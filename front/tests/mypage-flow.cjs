@@ -33,7 +33,7 @@ const assert = require('node:assert/strict');
   else throw Error(path);
   await route.fulfill({status,contentType:'application/json',body:JSON.stringify(wrapped?{success:true,data}:data)});
  });
- await page.goto('http://127.0.0.1:5173/mypage');
+ await page.goto((process.env.TEST_BASE_URL || 'http://127.0.0.1:5173')+'/mypage');
  await page.getByText('아직 계산된 사주가 없습니다.',{exact:false}).waitFor();
  assert.equal(await page.getByRole('heading',{level:1}).innerText(),'가입닉네임');
  assert.equal(await page.getByRole('button',{name:'오늘의 운세 불러오기'}).isDisabled(),true);

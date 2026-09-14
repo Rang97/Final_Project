@@ -17,6 +17,7 @@ Playwright와 Microsoft Edge가 있는 환경에서 개발 서버를 실행한 �
 ```powershell
 node tests/auth-flow.cjs
 node tests/mypage-flow.cjs
+node tests/board-flow.cjs
 ```
 
 Playwright가 프로젝트 외부에 설치되어 있다면 `PLAYWRIGHT_MODULE`을 해당 모듈 경로로 설정합니다.
@@ -26,3 +27,7 @@ Playwright가 프로젝트 외부에 설치되어 있다면 `PLAYWRIGHT_MODULE`�
 토큰 복원, 서버 오류 후 재시도, 모바일 로그아웃, 보호 경로와 만료 처리를 검증합니다.
 마이페이지 테스트는 미등록 상태, 프로필과 오행, 운세 오류·성공, 차단 해제,
 입력 저장 후 계산 실패, 새로고침 후 불일치 감지와 재계산 재시도, 모바일 가로 넘침을 확인합니다.
+
+게시판 테스트는 비로그인 조회, 글쓰기 접근 보호와 로그인 후 복귀,
+공통 인증 토큰을 통한 게시글·댓글 작성/수정/삭제, 게시판 API의 401 응답 시 세션 만료를 검증합니다.
+게시판과 마이페이지 API는 동일한 `/api` 클라이언트와 sessionStorage 인증 정보를 사용합니다.

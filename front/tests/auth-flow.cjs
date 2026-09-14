@@ -8,9 +8,10 @@ const assert = require('node:assert/strict');
   let signupCalls = 0;
   let expire = false;
   let failRestore = false;
-  await page.route('**/api/auth/**', async route => {
+  await page.route('**/api/**', async route => {
     const request = route.request();
     const path = new URL(request.url()).pathname;
+    if (!path.startsWith('/api/')) return route.continue();
     let status = 200;
     let body;
     if (path.endsWith('/signup')) {
@@ -28,7 +29,11 @@ const assert = require('node:assert/strict');
       assert.equal(request.headers().authorization, 'Bearer test-token');
       status = expire ? 401 : failRestore ? 503 : 200;
       body = status === 200 ? {userId:1,loginId:'tester_123',nickname:'테스트유저',role:'USER'} : {};
-    } else throw new Error(path);
+    } else if (path === '/api/auth/birth-time-options') body = [{value:'UNKNOWN',label:'모름'}];
+    else if (path === '/api/mypage/summary') body = {data:{saju:null,games:[]}};
+    else if (path === '/api/blocks') body = {data:[]};
+    else if (path === '/api/saju/input') { status = 404; body = {}; }
+    else throw new Error(path);
     await route.fulfill({status, contentType:'application/json', body:JSON.stringify(body)});
   });
   const origin = process.env.TEST_BASE_URL || 'http://127.0.0.1:5173';
