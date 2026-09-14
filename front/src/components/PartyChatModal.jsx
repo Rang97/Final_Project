@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Client } from "@stomp/stompjs";
 import { api } from "../api/client";
+import { useAuthStore } from "../store/authStore";
 import PartyElementPie from "./PartyElementPie";
 import {
   ELEMENT_COLORS,
@@ -10,6 +11,8 @@ import {
 } from "../constants/fiveElements";
 import ErrorToast from "./ErrorToast";
 
+export default function PartyChatModal({ party, onClose }) {
+  const token = useAuthStore((state) => state.token);
 export default function PartyChatModal({ party, onClose, onLeave, onDelete }) {
   const [messages, setMessages] = useState([]); // 메시지 배열
   const [input, setInput] = useState(""); // 입력창 값
@@ -44,7 +47,7 @@ export default function PartyChatModal({ party, onClose, onLeave, onDelete }) {
     const client = new Client({
       brokerURL: "ws://localhost:8080/ws",
       connectHeaders: {
-        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       onConnect: () => {
         client.subscribe("/sub/party/" + party.partyId, (message) => {
@@ -79,7 +82,7 @@ export default function PartyChatModal({ party, onClose, onLeave, onDelete }) {
     return () => {
       client.deactivate();
     };
-  }, [party.partyId]);
+  }, [party.partyId, token]);
 
   // 애니메이션
   useEffect(() => {

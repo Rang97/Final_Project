@@ -27,7 +27,7 @@ html,
 body,
 #root {
   height: 100%;
-  background: #07070e;
+  background: #06040f;
   color: #f0f0fa;
   font-family: "Inter", sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -45,7 +45,7 @@ body,
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(124, 58, 237, 0.35);
+  background: rgba(38, 28, 193, 0.5);
   border-radius: 99px;
 }
 * {

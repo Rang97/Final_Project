@@ -101,20 +101,21 @@ function SortDropdown({ placeholder, options, sortBy, onChange }) {
 }
 
 export default function PartyPage() {
-  const [parties, setParties] = useState([]);
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const [parties, setParties] = useState([]); // 파티 목록
+  const [loading, setLoading] = useState(true); // 로딩
   const [sortBy, setSortBy] = useState(undefined); // 기본 최신순
-  const [ascending, setAscending] = useState(true);
-  const [joined, setJoined] = useState([]);
-  const [error, setError] = useState(null);
-  const [activeChatParty, setActiveChatParty] = useState(null);
+  const [ascending, setAscending] = useState(true); // 오름/내림
+  const [joined, setJoined] = useState([]); // 참가 파티 배열
+  const [error, setError] = useState(null); // 에러
+  const [activeChatParty, setActiveChatParty] = useState(null); // 채팅 띄울 대상 파티
 
   // 드롭다운 선택 -> sortBy 갱신
   const handleSortChange = (value) => {
     setSortBy(value || undefined); // 빈 값 선택 시 정렬 해제 (최신순)
   };
 
+  // 정렬 조건 넘겨서 목록 요청
   useEffect(() => {
     api
       .get("/party/party-list", { params: { sortBy, ascending } })
@@ -127,12 +128,15 @@ export default function PartyPage() {
         setError("파티 목록을 불러오지 못했습니다.");
       })
       .finally(() => setLoading(false));
+    // 정렬 기준 바뀔 때마다 자동 요청
   }, [sortBy, ascending]);
 
+  // 성공 시 파티 목록 추가 (버튼 상태 즉시 변경)
   const handleJoin = async (party) => {
     try {
       await api.post(`/party/${party.partyId}/join`);
       setJoined((prev) => [...prev, party.partyId]);
+      // 바로 채팅 모달 오픈
       setActiveChatParty(party);
       setError(null);
     } catch (err) {
@@ -240,7 +244,7 @@ export default function PartyPage() {
       {/* error */}
       <ErrorToast message={error} onClose={() => setError(null)} />
 
-      {/* 파티 카드 */}
+      {/* 파티 카드: 없을 시 안내 문구 출력 */}
       {parties.length === 0 ? (
         <p className="text-center py-20 text-sm" style={{ color: "#3A9AFF" }}>
           등록된 파티가 없습니다.

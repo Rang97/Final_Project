@@ -7,27 +7,30 @@ import MyPage from "./pages/MyPage";
 import LoginPage from "./pages/LoginPage";
 import Layout from "./components/Layout";
 import PartyCreatePage from "./pages/PartyCreatePage";
+import BoardWritePage from "./pages/BoardWritePage";
+import BoardEditPage from "./pages/BoardEditPage";
+import AuthGate, { RequireAuth } from "./features/auth/AuthGate";
 
 export default function App() {
   return (
     <BrowserRouter>
+      <AuthGate>
       <Routes>
-        {/* 로그인 */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<LoginPage />} />
         <Route element={<Layout />}>
-          {/* 메인 */}
           <Route path="/" element={<HomePage />} />
-          {/* 게시판 */}
           <Route path="/board" element={<BoardPage />} />
+          <Route path="/board/write" element={<RequireAuth><BoardWritePage /></RequireAuth>} />
+          <Route path="/board/:id/edit" element={<RequireAuth><BoardEditPage /></RequireAuth>} />
           <Route path="/board/:id" element={<BoardDetailPage />} />
-          {/* 파티 */}
           <Route path="/party" element={<PartyPage />} />
-          <Route path="/party/create" element={<PartyCreatePage />}></Route>
-          {/* 마이페이지 */}
-          <Route path="/mypage" element={<MyPage />} />
+          <Route path="/party/create" element={<RequireAuth><PartyCreatePage /></RequireAuth>} />
+          <Route path="/mypage" element={<RequireAuth><MyPage /></RequireAuth>} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </AuthGate>
     </BrowserRouter>
   );
 }
