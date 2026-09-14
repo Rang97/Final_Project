@@ -19,6 +19,7 @@ export default function PartyChatModal({ party, onClose }) {
   const [visible, setVisible] = useState(false); // 모달 애니메이션
   const [hoveredElement, setHoveredElement] = useState(null); // 오행 중 마우스 올린 항목
   const [error, setError] = useState(null);
+  const [nowMemberCount, setNowMemberCount] = useState(party.nowMemberCount); // 실시간 인원 수
 
   // 내 닉네임 조회
   useEffect(() => {
@@ -39,6 +40,17 @@ export default function PartyChatModal({ party, onClose }) {
         client.subscribe("/sub/party/" + party.partyId, (message) => {
           const data = JSON.parse(message.body);
           setMessages((prev) => [...prev, data]);
+
+          if (data.type === "SYSTEM") {
+            api
+              .get(`/party/${party.partyId}`)
+              .then((res) => setNowMemberCount(res.data.nowMemberCount))
+              .catch((err) => console.error(err));
+          }
+          api
+            .get(`/party/${party.partyId}/chemistry`)
+            .then((res) => setChemistry(res.data))
+            .catch((err) => console.error(err));
         });
       },
       onStompError: (frame) => {
@@ -67,8 +79,7 @@ export default function PartyChatModal({ party, onClose }) {
   // 상세 패널
   const handleToggleDetail = (e) => {
     e.stopPropagation();
-    // 패널 열 때만 API 호출
-    if (!showDetail && !chemistry) {
+    if (!showDetail) {
       api
         // 파티원 전체 오행 합계 조회
         .get(`/party/${party.partyId}/chemistry`)
@@ -120,7 +131,11 @@ export default function PartyChatModal({ party, onClose }) {
           style={{
             width: showDetail ? "260px" : "0px",
             background: "rgba(10,10,20,0.95)",
-            border: showDetail ? "1px solid rgba(255,255,255,0.1)" : "none",
+            borderTop: showDetail ? "1px solid rgba(255,255,255,0.1)" : "none",
+            borderBottom: showDetail
+              ? "1px solid rgba(255,255,255,0.1)"
+              : "none",
+            borderLeft: showDetail ? "1px solid rgba(255,255,255,0.1)" : "none",
             borderRight: "none",
           }}
         >
@@ -189,7 +204,7 @@ export default function PartyChatModal({ party, onClose }) {
                   className="text-[10px] text-center"
                   style={{ color: "#e8e8f0" }}
                 >
-                  현재 {party.nowMemberCount}명 기준
+                  현재 {nowMemberCount}명 기준
                 </p>
               </>
             )}
@@ -251,7 +266,7 @@ export default function PartyChatModal({ party, onClose }) {
                     className="w-2 h-2"
                     style={{
                       background:
-                        i < party.nowMemberCount
+                        i < nowMemberCount
                           ? "#3A9AFF"
                           : "rgba(255,255,255,0.2)",
                     }}
