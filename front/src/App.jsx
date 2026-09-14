@@ -6,24 +6,23 @@ import PartyPage from "./pages/PartyPage";
 import MyPage from "./pages/MyPage";
 import LoginPage from "./pages/LoginPage";
 import Layout from "./components/Layout";
+import BoardWritePage from "./pages/BoardWritePage";
+import BoardEditPage from "./pages/BoardEditPage";
 import PartyCreatePage from "./pages/PartyCreatePage";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* 로그인 */}
         <Route path="/login" element={<LoginPage />} />
         <Route element={<Layout />}>
-          {/* 메인 */}
           <Route path="/" element={<HomePage />} />
-          {/* 게시판 */}
           <Route path="/board" element={<BoardPage />} />
+          <Route path="/board/write" element={<BoardWritePage />} />
           <Route path="/board/:id" element={<BoardDetailPage />} />
-          {/* 파티 */}
+          <Route path="/board/:id/edit" element={<BoardEditPage />} />
           <Route path="/party" element={<PartyPage />} />
           <Route path="/party/create" element={<PartyCreatePage />}></Route>
-          {/* 마이페이지 */}
           <Route path="/mypage" element={<MyPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
