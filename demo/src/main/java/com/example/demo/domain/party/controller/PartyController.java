@@ -2,6 +2,7 @@ package com.example.demo.domain.party.controller;
 
 import com.example.demo.domain.party.dto.PartyCreateRequest;
 import com.example.demo.domain.party.dto.PartyListResponse;
+import com.example.demo.domain.party.dto.PartyMemberReponse;
 import com.example.demo.domain.party.dto.PartyUpdateRequest;
 import com.example.demo.domain.party.entity.ChemistryType;
 import com.example.demo.domain.party.entity.Party;
@@ -164,6 +165,15 @@ public class PartyController {
     ) {
         List<PartyListResponse> parties = partyService.getPartyList(sortBy, ascending, user, gameId);
         return ResponseEntity.ok(parties);
+    }
+
+    // 파티원 목록 조회
+    @GetMapping("/{partyId}/members")
+    @Operation(summary = "파티원 목록 조회", description = "파티에 속한 파티원의 userId와 사주 동물 닉네임을 반환합니다.")
+    public ResponseEntity<List<PartyMemberReponse>> getPartyMembers(@Parameter(description = "파티 ID", example = "1")
+                                                                    @PathVariable Long partyId) {
+        List<PartyMemberReponse> members = partyService.getPartyMembers(partyId);
+        return ResponseEntity.ok(members);
     }
 
     // 파티원 오행 현황 조회
