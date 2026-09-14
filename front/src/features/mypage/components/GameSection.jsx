@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useMyGames } from "../hooks/useMyGames";
+import GamePickerModal from "./GamePickerModal";
 
 // 게임 이미지가 없을 때(coverUrl이 null) 보여줄 기본 배경
 const FALLBACK_COVER =
@@ -9,13 +10,13 @@ const FALLBACK_COVER =
 // - 목록 조회: GET /api/users/me/games
 // - 삭제: DELETE /api/users/me/games/{gameId}
 // - 대표 지정: PATCH /api/users/me/games/{gameId}/main
-// - 새 게임 "추가"는 전체 게임 카탈로그(GET /api/games)가 아직 없어서 미구현 상태
-//   (백엔드에서 해당 API 나오면 여기에 추가 버튼/모달을 붙이면 됨)
+// - 추가: 전체 카탈로그 GET /api/games → POST /api/users/me/games
 export default function GameSection() {
-  const { games, isLoading, error, isMutating, isMaxed, removeGame, makeMain } =
+  const { games, isLoading, error, isMutating, isMaxed, addGame, removeGame, makeMain } =
     useMyGames();
 
   const [actionError, setActionError] = useState(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const handleRemove = async (gameId) => {
     setActionError(null);
@@ -77,6 +78,9 @@ export default function GameSection() {
             {isMaxed && " (최대 등록 개수에 도달했습니다)"}
           </p>
         </div>
+        <button type="button" onClick={() => setPickerOpen(true)} disabled={isMutating} className="shrink-0 rounded bg-[#3A9AFF]/20 px-3 py-2 text-sm font-bold text-[#3A9AFF] hover:bg-[#3A9AFF]/30 disabled:opacity-40">
+          + 게임 추가
+        </button>
       </div>
 
       {games.length === 0 && (
@@ -146,12 +150,7 @@ export default function GameSection() {
         <p className="text-xs text-red-400 mt-4">{actionError}</p>
       )}
 
-      <div className="mt-6 pt-6 border-t border-white/5">
-        <p className="text-xs text-[#f0f0fa]/30">
-          + 새 게임 추가 기능은 전체 게임 목록 API가 준비되는 대로 열릴
-          예정입니다.
-        </p>
-      </div>
+      {pickerOpen && <GamePickerModal games={games} isMutating={isMutating} onAdd={addGame} onClose={() => setPickerOpen(false)} />}
     </div>
   );
 }

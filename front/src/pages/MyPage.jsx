@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuthStore } from "../store/authStore";
 import GameSection from "../features/mypage/components/GameSection";
+import { getGameCatalog } from "../features/mypage/api/gameApi";
 import {
   blankInput,
   calculate,
@@ -54,6 +55,7 @@ export default function MyPage() {
   const [saveNotice, setSaveNotice] = useState("");
   const [saveError, setSaveError] = useState("");
   const [fortune, setFortune] = useState(null);
+  const [fortuneGames, setFortuneGames] = useState([]);
   const [fortuneBusy, setFortuneBusy] = useState(false);
   const [fortuneError, setFortuneError] = useState("");
   const [removing, setRemoving] = useState(null);
@@ -149,7 +151,9 @@ export default function MyPage() {
     setFortuneBusy(true);
     setFortuneError("");
     try {
-      setFortune(await getFortune());
+      const [result, games] = await Promise.all([getFortune(), getGameCatalog()]);
+      setFortuneGames(games);
+      setFortune(result);
     } catch (error) {
       setFortuneError(errorMessage(error));
     } finally {
@@ -177,7 +181,9 @@ export default function MyPage() {
     }
   }
   const gameName = (id) =>
-    summary?.games?.find((game) => game.gameId === id)?.name || `게임 ${id}`;
+    fortuneGames.find((game) => String(game.gameId) === String(id))?.name ||
+    summary?.games?.find((game) => String(game.gameId) === String(id))?.name ||
+    "알 수 없는 게임";
 
   return (
     <div className="max-w-4xl mx-auto px-6 md:px-10 py-10 space-y-6 text-[#f0f0fa] selection:bg-[#F1FF5E] selection:text-[#1C0770]">

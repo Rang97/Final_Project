@@ -18,6 +18,7 @@ const assert = require('node:assert/strict');
   else if(path==='/api/auth/birth-time-options'){data=options;wrapped=false;}
   else if(path==='/api/mypage/summary') data={saju,games:[]};
   else if(path==='/api/users/me/games') data=[];
+  else if(path==='/api/games') data=[];
   else if(path==='/api/saju/input'){data=input;wrapped=false;if(!input)status=404;}
   else if(path==='/api/blocks') data=blocked?[{blockedUserId:2,blockedNickname:'차단유저',createdAt:'2026-09-11T12:00:00'}]:[];
   else if(path==='/api/blocks/2' && req.method()==='DELETE'){blocked=false;data=null;}

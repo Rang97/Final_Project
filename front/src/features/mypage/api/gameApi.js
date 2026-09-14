@@ -1,5 +1,10 @@
 import apiClient from "../../../api/apiClient";
 
+export const getGameCatalog = async () => {
+  const response = await apiClient.get("/games");
+  return response.data.data;
+};
+
 export const getMyGames = async () => {
   const response = await apiClient.get("/users/me/games");
   return response.data.data;
