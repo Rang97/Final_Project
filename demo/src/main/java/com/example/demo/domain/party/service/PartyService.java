@@ -208,15 +208,7 @@ public class PartyService {
 
     // 파티 하나의 특정 오행 합산 점수 계산
     private double getElementScore(Long partyId, FiveElement element) {
-        List<Long> memberIds = partyMemberMapper.findApprovedMemberIds(partyId);
-        if (memberIds.isEmpty()) {
-            return 0;
-        }
-
-        List<FiveElementProfile> profiles = sajuMapper.findElementsByUserId(memberIds).stream()
-                .map(SajuElementDto::toProfile)
-                .toList();
-        GroupElementSummary summary = chemistryService.summarizeGroup(profiles);
+        GroupElementSummary summary = chemistryService.summarizeGroup(getGroupProfiles(partyId));
 
         return switch (element){
             case WOOD -> summary.totalWood();
