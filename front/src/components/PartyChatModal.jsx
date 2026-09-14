@@ -11,6 +11,8 @@ import {
 } from "../constants/fiveElements";
 import ErrorToast from "./ErrorToast";
 
+
+
 export default function PartyChatModal({ party, onClose, onLeave, onDelete }) {
   const token = useAuthStore((state) => state.token);
   const [messages, setMessages] = useState([]); // 메시지 배열

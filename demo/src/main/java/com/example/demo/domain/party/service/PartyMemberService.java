@@ -38,11 +38,12 @@ public class PartyMemberService {
         }
         Party party = partyMapper.findById(partyId);
 
+        if (party == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "삭제되었거나 존재하지 않는 파티입니다.");
+        }
+
         if (party.getStatus() == PartyStatus.RECRUITING && party.getNowMemberCount() < party.getMaxMemberCount()) {
             PartyMember existing = partyMemberMapper.findByPartyIdAndUserId(partyId, userId);
-            if (existing != null && existing.getStatus() == PartyMemberStatus.APPROVED) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 가입된 파티입니다.");
-            }
             // 새로 가입한 경우 -> insert
             if (existing != null && existing.getStatus() == PartyMemberStatus.APPROVED) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 가입된 파티입니다.");
@@ -71,6 +72,10 @@ public class PartyMemberService {
     @Transactional
     public void leaveParty(Long partyId, Long userId) {
         Party party = partyMapper.findById(partyId);
+        if (party == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "삭제되었거나 존재하지 않는 파티입니다.");
+        }
+
         if (party.getHostId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "방장은 파티를 떠날 수 없습니다, 삭제를 이용하세요.");
         }

@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.lang.module.ResolutionException;
 import java.util.Comparator;
 import java.util.List;
 
@@ -67,6 +68,10 @@ public class PartyService {
     public void deleteParty(Long userId, Long partyId) {
         Party party = partyMapper.findById(partyId);
 
+        if (party == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "삭제되었거나 존재하지 않는 파티입니다.");
+        }
+
         // 방장 아닐 시 삭제 X
         if (!party.getHostId().equals(userId)){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "방장만 삭제할 수 있습니다.");
@@ -80,6 +85,10 @@ public class PartyService {
     public void deletePartyMember(Long hostId, Long partyId, Long targetUserId) {
         // 1. 방장 확인
         Party party = partyMapper.findById(partyId);
+
+        if (party == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "삭제되었거나 존재하지 않는 파티입니다.");
+        }
 
         // 2. 방장 권한 확인
         if (!party.getHostId().equals(hostId)) {
