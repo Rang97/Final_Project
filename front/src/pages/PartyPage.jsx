@@ -140,6 +140,18 @@ export default function PartyPage() {
     }
   };
 
+  const handlePartyLeave = (partyId) => {
+    setJoined((prev) => prev.filter((id) => id !== partyId));
+    setParties((prev) =>
+      prev.map((p) => (p.partyId === partyId ? { ...p, joined: false } : p)),
+    );
+  };
+
+  const handlePartyDelete = (partyId) => {
+    setParties((prev) => prev.filter((p) => p.partyId !== partyId));
+    setJoined((prev) => prev.filter((id) => id !== partyId));
+  };
+
   if (loading) {
     return (
       <div
@@ -217,7 +229,7 @@ export default function PartyPage() {
             </span>
           </button>
           <button
-            className="brand-gradient-btn px-5 py-2 rounded-xl text-sm font-semibold text-white ml-35"
+            className="brand-gradient-btn px-5 py-2 rounded-xl text-sm font-semibold text-white ml-35 shrink-0"
             onClick={() => navigate("/party/create")}
           >
             파티 생성
@@ -400,6 +412,8 @@ export default function PartyPage() {
         <PartyChatModal
           party={activeChatParty}
           onClose={() => setActiveChatParty(null)}
+          onLeave={handlePartyLeave}
+          onDelete={handlePartyDelete}
         />
       )}
     </div>

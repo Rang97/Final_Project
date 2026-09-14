@@ -6,10 +6,11 @@ import {
   ELEMENT_COLORS,
   ELEMENT_LABELS,
   ELEMENT_TOTAL_KEYS,
+  ANIMAL_ICONS,
 } from "../constants/fiveElements";
 import ErrorToast from "./ErrorToast";
 
-export default function PartyChatModal({ party, onClose }) {
+export default function PartyChatModal({ party, onClose, onLeave, onDelete }) {
   const [messages, setMessages] = useState([]); // 메시지 배열
   const [input, setInput] = useState(""); // 입력창 값
   const [myAnimalName, setMyAnimalName] = useState(null); // 사주 닉
@@ -20,6 +21,7 @@ export default function PartyChatModal({ party, onClose }) {
   const [hoveredElement, setHoveredElement] = useState(null); // 오행 중 마우스 올린 항목
   const [error, setError] = useState(null);
   const [nowMemberCount, setNowMemberCount] = useState(party.nowMemberCount); // 실시간 인원 수
+  const [members, setMembers] = useState([]); // 파티원 목록
 
   // 내 닉네임 조회
   useEffect(() => {
@@ -28,6 +30,14 @@ export default function PartyChatModal({ party, onClose }) {
       .then((res) => setMyAnimalName(res.data.data.saju.sajuAnimalName))
       .catch((err) => console.error(err));
   }, []);
+
+  // 파티원 목록 조회
+  const fetchMembers = () => {
+    api
+      .get(`/party/${party.partyId}/members`)
+      .then((res) => setMembers(res.data))
+      .catch((err) => console.error(err));
+  };
 
   // STOMP 연결
   useEffect(() => {
@@ -46,6 +56,7 @@ export default function PartyChatModal({ party, onClose }) {
               .get(`/party/${party.partyId}`)
               .then((res) => setNowMemberCount(res.data.nowMemberCount))
               .catch((err) => console.error(err));
+            fetchMembers();
           }
           api
             .get(`/party/${party.partyId}/chemistry`)
@@ -70,11 +81,13 @@ export default function PartyChatModal({ party, onClose }) {
     };
   }, [party.partyId]);
 
-  //
+  // 애니메이션
   useEffect(() => {
     const id = requestAnimationFrame(() => setVisible(true));
     return () => cancelAnimationFrame(id);
   }, []);
+
+  const iAmHost = myAnimalName === party.hostNickname; // 방장 여부
 
   // 상세 패널
   const handleToggleDetail = (e) => {
@@ -85,6 +98,7 @@ export default function PartyChatModal({ party, onClose }) {
         .get(`/party/${party.partyId}/chemistry`)
         .then((res) => setChemistry(res.data))
         .catch((err) => console.error(err));
+      fetchMembers();
     }
     setShowDetail((prev) => !prev);
   };
@@ -92,6 +106,41 @@ export default function PartyChatModal({ party, onClose }) {
   const handleClose = () => {
     setVisible(false);
     setTimeout(onClose, 300);
+  };
+
+  // 파티원 추방 (방장 전용)
+  const handleKick = (userId) => {
+    api
+      .delete(`/party/${party.partyId}/kicked/${userId}`)
+      .catch((err) =>
+        setError(err.response?.data?.message ?? "추방에 실패했습니다."),
+      );
+  };
+
+  // 파티 탈퇴 (본인)
+  const handleLeave = () => {
+    api
+      .post(`/party/${party.partyId}/leave`)
+      .then(() => {
+        onLeave?.(party.partyId);
+        handleClose();
+      })
+      .catch((err) =>
+        setError(err.response?.data?.message ?? "탈퇴에 실패했습니다."),
+      );
+  };
+
+  // 파티 삭제 (방장 전용)
+  const handleDeleteParty = () => {
+    api
+      .delete(`/party/delete/${party.partyId}`)
+      .then(() => {
+        onDelete?.(party.partyId);
+        handleClose();
+      })
+      .catch((err) =>
+        setError(err.response?.data?.message ?? "삭제에 실패했습니다."),
+      );
   };
 
   // 전송
@@ -127,19 +176,69 @@ export default function PartyChatModal({ party, onClose }) {
       >
         {/* 오행 상세 패널 — 카드 밖, 왼쪽에 붙음 */}
         <div
-          className="overflow-hidden transition-all duration-300 rounded-xl"
+          className="overflow-hidden transition-all duration-300 relative"
           style={{
+            zIndex: 1,
             width: showDetail ? "260px" : "0px",
-            background: "rgba(10,10,20,0.95)",
-            borderTop: showDetail ? "1px solid rgba(255,255,255,0.1)" : "none",
+            background: "rgba(5,15,30,0.92)",
+            borderTop: showDetail ? "1px solid rgba(80,220,255,0.5)" : "none",
             borderBottom: showDetail
-              ? "1px solid rgba(255,255,255,0.1)"
+              ? "1px solid rgba(80,220,255,0.5)"
               : "none",
-            borderLeft: showDetail ? "1px solid rgba(255,255,255,0.1)" : "none",
-            borderRight: "none",
+            borderLeft: showDetail ? "1px solid rgba(80,220,255,0.5)" : "none",
+            borderRight: showDetail ? "1px solid rgba(80,220,255,0.5)" : "none",
           }}
         >
-          <div className="w-65 shrink-0 h-full flex flex-col px-5 py-4 gap-4">
+          {/* 상태창 프레임 장식 — 모서리 브라켓 + STATUS 탭 */}
+          {showDetail && (
+            <>
+              <span
+                className="absolute top-0 left-0 w-3.5 h-3.5 pointer-events-none"
+                style={{
+                  borderTop: "2px solid #7fe3ff",
+                  borderLeft: "2px solid #7fe3ff",
+                }}
+              />
+              <span
+                className="absolute bottom-0 left-0 w-3.5 h-3.5 pointer-events-none"
+                style={{
+                  borderBottom: "2px solid #7fe3ff",
+                  borderLeft: "2px solid #7fe3ff",
+                }}
+              />
+              <span
+                className="absolute top-0 right-0 w-3.5 h-3.5 pointer-events-none"
+                style={{
+                  borderTop: "2px solid #7fe3ff",
+                  borderRight: "2px solid #7fe3ff",
+                }}
+              />
+              <span
+                className="absolute bottom-0 right-0 w-3.5 h-3.5 pointer-events-none"
+                style={{
+                  borderBottom: "2px solid #7fe3ff",
+                  borderRight: "2px solid #7fe3ff",
+                }}
+              />
+              <span
+                className="absolute top-0 left-1/2 text-[9px] px-2 pointer-events-none"
+                style={{
+                  transform: "translate(-50%)",
+                  color: "#7fe3ff",
+                  background: "rgba(5,15,30,0.92)",
+                  letterSpacing: "0.3em",
+                  fontFamily: "Consolas, monospace",
+                  paddingTop: "3px",
+                  paddingBottom: "2px",
+                  borderBottomLeftRadius: "6px",
+                  borderBottomRightRadius: "6px",
+                }}
+              >
+                STATUS
+              </span>
+            </>
+          )}
+          <div className="w-65 shrink-0 h-full flex flex-col px-5 py-4 pt-8 pb-4 gap-4">
             {!chemistry ? (
               <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
                 불러오는 중...
@@ -148,7 +247,7 @@ export default function PartyChatModal({ party, onClose }) {
               <>
                 <p
                   className="text-xs font-semibold text-center"
-                  style={{ color: "#e8e8f0" }}
+                  style={{ color: "rgba(80,220,255,0.8)" }}
                 >
                   오행 현황
                 </p>
@@ -162,9 +261,30 @@ export default function PartyChatModal({ party, onClose }) {
                   style={{ color: "#e8e8f0" }}
                 >
                   {/* 많은 오행, 적은 오행 다른 문구 표시 */}
-                  {chemistry.maxElements?.[0] === chemistry.minElements?.[0]
-                    ? "오행이 고르게 분포돼 있어요"
-                    : `${ELEMENT_LABELS[chemistry.maxElements?.[0]]} 기운이 강하고, ${ELEMENT_LABELS[chemistry.minElements?.[0]]} 기운이 부족해요`}
+                  {chemistry.maxElements?.[0] === chemistry.minElements?.[0] ? (
+                    "오행이 고르게 분포돼 있어요"
+                  ) : (
+                    <>
+                      <span
+                        style={{
+                          color: ELEMENT_COLORS[chemistry.maxElements?.[0]],
+                          fontWeight: 700,
+                        }}
+                      >
+                        {ELEMENT_LABELS[chemistry.maxElements?.[0]]}
+                      </span>
+                      {" 기운이 강하고, "}
+                      <span
+                        style={{
+                          color: ELEMENT_COLORS[chemistry.minElements?.[0]],
+                          fontWeight: 700,
+                        }}
+                      >
+                        {ELEMENT_LABELS[chemistry.minElements?.[0]]}
+                      </span>
+                      {" 기운이 부족해요"}
+                    </>
+                  )}
                 </p>
 
                 <div className="flex gap-2">
@@ -206,6 +326,51 @@ export default function PartyChatModal({ party, onClose }) {
                 >
                   현재 {nowMemberCount}명 기준
                 </p>
+                <hr
+                  style={{
+                    color: "rgba(80,220,255,0.5)",
+                  }}
+                />
+                {/* 파티원 조회 / 탈퇴 / 추방 */}
+                <div className="flex flex-col gap-1.5 mt-1">
+                  {members.map((member) => {
+                    const isHostRow = member.nickname === party.hostNickname;
+                    const isMe = member.nickname === myAnimalName;
+                    return (
+                      <div
+                        key={member.userId}
+                        className="flex items-center justify-between text-xs"
+                        style={{ color: "rgba(255,255,255,0.75)" }}
+                      >
+                        <span className="flex items-center gap-1.5">
+                          <span
+                            className="w-5 h-5 rounded-full flex items-center justify-center text-[11px] shrink-0"
+                            style={{ background: "rgba(255,255,255,0.08)" }}
+                          >
+                            {ANIMAL_ICONS[member.nickname?.split(" ").pop()] ??
+                              "🐾"}
+                          </span>
+                          {member.nickname}
+                          {isHostRow && " 👑"}
+                        </span>
+                        {iAmHost && !isHostRow && (
+                          <button
+                            onClick={() => handleKick(member.userId)}
+                            className="text-[11px] font-bold px-2 py-0.5 rounded-full"
+                            style={{
+                              background: "rgba(255,77,77,0.15)",
+                              color: "#ff4d4d",
+                              border: "1px solid rgba(255,77,77,0.4)",
+                              letterSpacing: "0.02em",
+                            }}
+                          >
+                            추방
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </>
             )}
           </div>
@@ -224,12 +389,12 @@ export default function PartyChatModal({ party, onClose }) {
           onClick={() => setShowDetail(false)}
         >
           <div
-            className="flex items-center justify-between px-5 py-4"
+            className="flex items-center justify-between px-5 py-4 gap-2"
             style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}
           >
             {/* 타이틀 */}
             <p
-              className="text-sm font-semibold truncate"
+              className="text-sm font-semibold truncate flex-1 min-w-0"
               style={{ color: "#e8e8f0" }}
             >
               {party.title}
@@ -238,7 +403,7 @@ export default function PartyChatModal({ party, onClose }) {
             {/* 상세 버튼 */}
             <button
               onClick={handleToggleDetail}
-              className="flex justify-items-start text-xs px-3 py-1 rounded-full border transition-colors"
+              className="flex justify-items-start text-xs px-3 py-1 rounded-full border transition-colors shrink-0"
               style={{
                 borderColor: showDetail ? "#3A9AFF" : "rgba(255,255,255,0.15)",
                 color: showDetail ? "#3A9AFF" : "rgba(255,255,255,0.6)",
@@ -256,9 +421,26 @@ export default function PartyChatModal({ party, onClose }) {
             >
               상세
             </button>
+            {/* 삭제(방장) / 나가기(파티원) 버튼 */}
+            <button
+              onClick={iAmHost ? handleDeleteParty : handleLeave}
+              className="text-xs px-3 py-1 rounded-full border transition-colors shrink-0"
+              style={{
+                borderColor: "rgba(255,77,77,0.4)",
+                color: "#ff4d4d",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(255,77,77,0.15)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "transparent";
+              }}
+            >
+              {iAmHost ? "삭제" : "나가기"}
+            </button>
 
             {/* 인원수 사각 */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 shrink-0">
               <div className="flex items-center gap-1 justify-end">
                 {Array.from({ length: party.maxMemberCount }).map((_, i) => (
                   <div
@@ -310,9 +492,6 @@ export default function PartyChatModal({ party, onClose }) {
                   key={i}
                   className={`chat-message-row ${isMine ? "chat-row-personal" : ""}`}
                 >
-                  {!isMine && (
-                    <div className="chat-avatar">{msg.sender?.[0]}</div>
-                  )}
                   <div className="min-w-0">
                     {showSender && <p className="chat-sender">{msg.sender}</p>}
                     <div

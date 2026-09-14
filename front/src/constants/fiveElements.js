@@ -26,3 +26,19 @@ export const ELEMENT_TOTAL_KEYS = {
   METAL: "totalMetal",
   WATER: "totalWater",
 };
+
+// 사주 동물별 아이콘 (닉네임 뒤쪽 동물 이름으로 매칭)
+export const ANIMAL_ICONS = {
+  쥐: "🐭",
+  소: "🐮",
+  호랑이: "🐯",
+  토끼: "🐰",
+  용: "🐲",
+  뱀: "🐍",
+  말: "🐴",
+  양: "🐑",
+  원숭이: "🐵",
+  닭: "🐔",
+  개: "🐶",
+  돼지: "🐷",
+};
