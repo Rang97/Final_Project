@@ -7,6 +7,7 @@ import {
   ELEMENT_LABELS,
   ELEMENT_TOTAL_KEYS,
 } from "../constants/fiveElements";
+import ErrorToast from "./ErrorToast";
 
 export default function PartyChatModal({ party, onClose }) {
   const [messages, setMessages] = useState([]); // 메시지 배열
@@ -42,23 +43,22 @@ export default function PartyChatModal({ party, onClose }) {
       },
       onStompError: (frame) => {
         console.error(frame);
-        setError(frame.headers["message"] ?? "채팅 연결에 실패했습니다.")
+        setError(frame.headers["message"] ?? "채팅 연결에 실패했습니다.");
       },
       onWebSocketError: () => {
-        setError("채팅 서버에 연결할 수 없습니다.")
-      }
+        setError("채팅 서버에 연결할 수 없습니다.");
+      },
     });
 
     client.activate();
     stompClientRef.current = client;
-    
 
     return () => {
       client.deactivate();
     };
   }, [party.partyId]);
 
-  // 
+  //
   useEffect(() => {
     const id = requestAnimationFrame(() => setVisible(true));
     return () => cancelAnimationFrame(id);
@@ -70,7 +70,7 @@ export default function PartyChatModal({ party, onClose }) {
     // 패널 열 때만 API 호출
     if (!showDetail && !chemistry) {
       api
-      // 파티원 전체 오행 합계 조회
+        // 파티원 전체 오행 합계 조회
         .get(`/party/${party.partyId}/chemistry`)
         .then((res) => setChemistry(res.data))
         .catch((err) => console.error(err));
@@ -103,6 +103,8 @@ export default function PartyChatModal({ party, onClose }) {
       style={{ background: "transparent" }}
       onClick={handleClose}
     >
+      <ErrorToast message={error} onClose={() => setError(null)} />
+
       <div
         className="absolute bottom-6 right-6 flex items-stretch transition-all duration-300"
         style={{
