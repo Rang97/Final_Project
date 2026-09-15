@@ -43,7 +43,7 @@ class UserGameControllerTest {
     @Test
     void listContainsAllGameFields() throws Exception {
         when(service.getMyGames()).thenReturn(java.util.List.of(
-                new com.example.demo.domain.user.dto.UserGameResponse(10L, "게임", "https://example.com/cover.png", "RPG", true)));
+                new com.example.demo.domain.user.dto.UserGameResponse(10L, "게임", "https://example.com/cover.png", "RPG", "게임 설명", true)));
         mvc.perform(get("/api/users/me/games"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("success").value(true))
@@ -51,6 +51,7 @@ class UserGameControllerTest {
                 .andExpect(jsonPath("data[0].name").value("게임"))
                 .andExpect(jsonPath("data[0].coverUrl").value("https://example.com/cover.png"))
                 .andExpect(jsonPath("data[0].genre").value("RPG"))
+                .andExpect(jsonPath("data[0].description").value("게임 설명"))
                 .andExpect(jsonPath("data[0].isMain").value(true));
     }
 

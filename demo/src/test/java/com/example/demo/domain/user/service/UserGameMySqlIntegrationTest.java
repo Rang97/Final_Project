@@ -49,11 +49,11 @@ class UserGameMySqlIntegrationTest {
         var dataSource = new DriverManagerDataSource(testUrl, username, password);
         jdbc = new JdbcTemplate(dataSource);
         jdbc.execute("CREATE TABLE `user` (user_id BIGINT PRIMARY KEY) ENGINE=InnoDB");
-        jdbc.execute("CREATE TABLE game (game_id BIGINT PRIMARY KEY, name_ko VARCHAR(100), cover_url VARCHAR(500), genre VARCHAR(100)) ENGINE=InnoDB");
+        jdbc.execute("CREATE TABLE game (game_id BIGINT PRIMARY KEY, name_ko VARCHAR(100), cover_url VARCHAR(500), genre VARCHAR(100), description VARCHAR(255)) ENGINE=InnoDB");
         jdbc.execute("CREATE TABLE user_game (user_game_id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id BIGINT NOT NULL, game_id BIGINT NOT NULL, is_main BOOLEAN NOT NULL DEFAULT FALSE, UNIQUE KEY uk_user_game(user_id,game_id), FOREIGN KEY(user_id) REFERENCES `user`(user_id), FOREIGN KEY(game_id) REFERENCES game(game_id)) ENGINE=InnoDB");
         jdbc.update("INSERT INTO `user` VALUES (1), (2)");
         for (int id = 1; id <= 6; id++) {
-            jdbc.update("INSERT INTO game VALUES (?, ?, ?, ?)", id, "Game " + id, "cover" + id, "RPG");
+            jdbc.update("INSERT INTO game VALUES (?, ?, ?, ?, ?)", id, "Game " + id, "cover" + id, "RPG", "Description " + id);
         }
         var factory = new SqlSessionFactoryBean();
         factory.setDataSource(dataSource);
@@ -107,7 +107,7 @@ class UserGameMySqlIntegrationTest {
         service.changeMainGame(2L);
         var games = service.getMyGames();
         assertThat(games).hasSize(4);
-        assertThat(games.getFirst()).isEqualTo(new com.example.demo.domain.user.dto.UserGameResponse(2L, "Game 2", "cover2", "RPG", true));
+        assertThat(games.getFirst()).isEqualTo(new com.example.demo.domain.user.dto.UserGameResponse(2L, "Game 2", "cover2", "RPG", "Description 2", true));
         service.delete(2L);
         assertThat(service.getMyGames()).noneMatch(com.example.demo.domain.user.dto.UserGameResponse::isMain);
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM user_game WHERE user_id=2 AND is_main=TRUE", Integer.class)).isEqualTo(1);
