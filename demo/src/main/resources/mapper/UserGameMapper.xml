@@ -5,7 +5,7 @@
 <mapper namespace="com.example.demo.domain.user.repository.UserGameMapper">
 
     <select id="findByUserId" resultType="com.example.demo.domain.user.dto.UserGameResponse">
-        SELECT g.game_id, g.name_ko AS name, g.cover_url, g.genre, ug.is_main
+        SELECT g.game_id, g.name_ko AS name, g.cover_url, g.genre, g.description, ug.is_main
         FROM user_game ug
         JOIN game g ON g.game_id = ug.game_id
         WHERE ug.user_id = #{userId}
