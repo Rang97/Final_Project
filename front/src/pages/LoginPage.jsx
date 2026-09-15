@@ -5,6 +5,7 @@ import { authErrorMessage } from "../api/client";
 import { useAuthStore } from "../store/authStore";
 
 const inputClass = "w-full px-4 py-3 rounded text-sm outline-none bg-white/5 border border-[#3A9AFF]/10 text-[#f0f0fa] focus:border-[#3A9AFF]";
+const selectClass = "w-full px-4 py-3 rounded text-sm outline-none bg-white border border-[#3A9AFF]/10 text-black focus:border-[#3A9AFF] [&_option]:bg-white [&_option]:text-black";
 const birthTimes = [
   ["JA", "자시 (23:30~01:29)"], ["CHUK", "축시 (01:30~03:29)"],
   ["IN", "인시 (03:30~05:29)"], ["MYO", "묘시 (05:30~07:29)"],
@@ -140,20 +141,20 @@ export default function LoginPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label htmlFor="gender" className="block text-xs mb-2 text-[#a4a4b2]">성별</label>
-                    <select id="gender" name="gender" value={saju.gender} onChange={updateSaju} className={inputClass} style={{ colorScheme: "dark" }}>
+                    <select id="gender" name="gender" value={saju.gender} onChange={updateSaju} className={selectClass} style={{ colorScheme: "light" }}>
                       <option value="">선택해 주세요</option><option value="MALE">남성</option><option value="FEMALE">여성</option>
                     </select>
                   </div>
                   <div>
                     <label htmlFor="calendarType" className="block text-xs mb-2 text-[#a4a4b2]">양력 / 음력</label>
-                    <select id="calendarType" name="calendarType" value={saju.calendarType} onChange={updateSaju} className={inputClass} style={{ colorScheme: "dark" }}>
+                    <select id="calendarType" name="calendarType" value={saju.calendarType} onChange={updateSaju} className={selectClass} style={{ colorScheme: "light" }}>
                       <option value="SOLAR">양력</option><option value="LUNAR">음력</option>
                     </select>
                   </div>
                 </div>
                 <div>
                   <label htmlFor="birthTimeBranch" className="block text-xs mb-2 text-[#a4a4b2]">태어난 시</label>
-                  <select id="birthTimeBranch" name="birthTimeBranch" value={saju.birthTimeBranch} onChange={updateSaju} className={inputClass} style={{ colorScheme: "dark" }}>
+                  <select id="birthTimeBranch" name="birthTimeBranch" value={saju.birthTimeBranch} onChange={updateSaju} className={selectClass} style={{ colorScheme: "light" }}>
                     {birthTimes.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                   </select>
                 </div>
